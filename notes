@@ -1,0 +1,12 @@
+Notes
+
+Static Taint Analysis 
+- Prototype-chain property lookups
+- Lexical-scoping rules for variable resolution
+- Reflexitive Property Accesses
+- Function Pointers
+
+
+
+
+
