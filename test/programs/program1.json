@@ -1,0 +1,23 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "alert"
+          },
+          "arguments": [
+            {
+              "type": "Literal",
+              "value": "Hello World!",
+              "raw": "\"Hello World!\""
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+}

@@ -1,0 +1,11 @@
+[
+    {"vulnerability": "Command Injection",
+    "sources": ["readline","req.headers","file_path"],
+    "sanitizers": ["escape", "sanitize"],
+    "sinks": ["exec", "execSync", "spawn", "spawnSync", "execFile", "execFileSync"]},
+  
+    {"vulnerability":"DOM XSS",
+    "sources":["document.referrer", "document.url", "document.location"],
+    "sanitizers":["encodeURI"],
+    "sinks":["eval", "document.write", "document.innerHTML", "setAttribute"]}
+]
