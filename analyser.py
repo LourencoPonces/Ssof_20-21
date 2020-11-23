@@ -23,12 +23,13 @@ class Analyser:
 
     def dispatcher(self, node):
         table = {
-            'Program':              self.analyse_program,
-            'ExpressionStatement':  self.analyse_expression,
-            'CallExpression':       self.analyse_call,
-            'MemberExpression':     self.analyse_member,
-            'Identifier':           self.analyse_identifier,
-            'Literal':              self.analyse_literal
+            'Program':                  self.analyse_program,
+            'ExpressionStatement':      self.analyse_expression,
+            'CallExpression':           self.analyse_call,
+            'MemberExpression':         self.analyse_member_expression,
+            'AssignementExpression':    self.analyse_assignement,
+            'Identifier':               self.analyse_identifier,
+            'Literal':                  self.analyse_literal
         }
 
         if node['type'] in table:
@@ -64,25 +65,67 @@ class Analyser:
                 tainted_args += argument
 
         if len(tainted_args) > 0:
+            initial_sources = tuple(ta['taint'].get_initial_sources() for tainted_arg in tainted_args)
+
             # calculate sources, path, etc
-            call_node['taint'] = Taint(value = True, initial_sources = "TODO", sources_path = "TODO", sanitizers = "TODO", sinks = "TODO")
+            call_node['taint'] = Taint(value = True, initial_sources = initial_sources, sanitizers = "TODO", sinks = "TODO")
 
             # TODO: We need to consider multiple sources in a single sink:
             # sink(source1, source2) will have to report 2 vulnerabilities
             if self.is_sink(callee['full_name']):
-                # create vuln
+                sink = callee['full_name']
                 self.vulnerabilities += [call_node]
                 print("FOUND VULNERABILITY!!!!!!!!!!!!!!!")
 
+            # TODO: verify if it is sanitizer
 
-    def analyse_member(self, member_node):
+    def analyse_member_expression(self, member_node):
         '''
             type: 'MemberExpression';
             computed: boolean;
             object: Expression;
             property: Expression;
         '''
-        print("Member")
+        print("Member Expression")
+        
+        obj = member_node['object']
+        print(f'Object: {obj}')
+
+        prop = member_node['prop']
+        print(f'Property: {prop}')
+
+        # TODO: Check when computed is True & False
+        
+        self.dispatcher(prop)
+        self.dispatcher(obj)
+
+    def analyse_assignement(self, assignment_node):
+        '''
+            type: 'AssigmentExpression';
+            operator: ;
+            left: Identifier;
+            right: Identifier;
+        '''
+        left = assignment_node['left']
+        right = assignment_node['right']
+        self.dispatcher(left)
+        self.dispatcher(right)
+        
+        
+        
+        assignment_node['taint'] = Taint(
+            value = right['taint'].is_tainted(),
+            initial_sources = right['taint'].get_initial_sources(),
+            sanitizers = right['taint'].get_sanitizers(),
+            sinks = right['taint'].get_sinks())          # count for nested assignments: a = (b = source)
+        
+        left['taint'] = Taint(
+            value = right['taint'].is_tainted(),
+            initial_sources = right['taint'].get_initial_sources(),
+            sanitizers = right['taint'].get_sanitizers(),
+            sinks = right['taint'].get_sinks())
+        #TODO propagar taintdness do lado direito para o lado esquerdo
+        
 
     def analyse_identifier(self, identifier_node):
         '''
@@ -91,7 +134,7 @@ class Analyser:
         '''
         name = identifier_node['name']
         print(f'Identifier: {name}')
-        identifier_node['taint'] = Taint(value = True, initial_sources = (name,), sources_path = ((name,),), sanitizers = (), sinks = ())
+        identifier_node['taint'] = Taint(value = True, initial_sources = (name,), sanitizers = (), sinks = ())
 
         # used above in recursion to find the full name (e.g. MemberExpression)
         identifier_node['full_name'] = name
