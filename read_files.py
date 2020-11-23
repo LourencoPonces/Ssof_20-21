@@ -6,7 +6,7 @@ from util import fatal
 def read_program (program_file_path):
     try:
         with open(program_file_path, 'r') as json_file:
-            return json.load(json_file)['body']
+            return json.load(json_file)
     except IOError:
         fatal(f'Program file: {program_file_path} does not exist')
 
