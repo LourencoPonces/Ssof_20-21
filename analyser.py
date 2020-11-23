@@ -58,14 +58,19 @@ class Analyser:
         self.dispatcher(callee)
         
         tainted_args = []
+        print("PRINTING ARGS")
         for argument in arguments:
             self.dispatcher(argument)
-
+            print(argument)
             if argument['taint'].is_tainted():
                 tainted_args += argument
 
         if len(tainted_args) > 0:
-            initial_sources = tuple(ta['taint'].get_initial_sources() for tainted_arg in tainted_args)
+            for tainted_arg in tainted_args:
+                # print(tainted_arg)
+                a = 0
+            
+            initial_sources = tuple(tainted_arg for tainted_arg in tainted_args)
 
             # calculate sources, path, etc
             call_node['taint'] = Taint(value = True, initial_sources = initial_sources, sanitizers = "TODO", sinks = "TODO")

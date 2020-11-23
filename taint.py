@@ -16,3 +16,12 @@ class Taint:
 
     def get_sinks(self):
         return self.sinks
+    
+    def __repr__(self):
+        d = {
+            'value': self.value,
+            'sources': self.initial_sources,
+            'sanitizers': self.sanitizers,
+            'sinks': self.sinks
+        }
+        return d.__repr__()
