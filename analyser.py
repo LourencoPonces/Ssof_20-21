@@ -56,21 +56,23 @@ class Analyser:
         # magic
         self.dispatcher(callee)
         
+        tainted_args = []
         for argument in arguments:
             self.dispatcher(argument)
 
-            tainted_args = []
             if argument['taint'].is_tainted():
                 tainted_args += argument
 
-            if len(tainted_args) > 0:
-                # calculate sources, path, etc
-                call_node['taint'] = Taint(value = True, initial_sources = "TODO", sources_path = "TODO", sanitizers = "TODO", sinks = "TODO")
+        if len(tainted_args) > 0:
+            # calculate sources, path, etc
+            call_node['taint'] = Taint(value = True, initial_sources = "TODO", sources_path = "TODO", sanitizers = "TODO", sinks = "TODO")
 
-                if self.is_sink(callee['full_name']):
-                    # create vuln
-                    self.vulnerabilities += [call_node]
-                    print("FOUND VULNERABILITY!!!!!!!!!!!!!!!")
+            # TODO: We need to consider multiple sources in a single sink:
+            # sink(source1, source2) will have to report 2 vulnerabilities
+            if self.is_sink(callee['full_name']):
+                # create vuln
+                self.vulnerabilities += [call_node]
+                print("FOUND VULNERABILITY!!!!!!!!!!!!!!!")
 
 
     def analyse_member(self, member_node):
