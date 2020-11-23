@@ -2,17 +2,7 @@ import sys
 
 from read_files import read_vulnerability_patterns, read_program
 from util import fatal
-
-def analyse(program, patterns):
-    vulns = []
-    
-    # In the end, check if any vuln found
-    if len(vulns) == 0:
-        print('No vulnerabilities found!')
-    else:
-        print(f'Found {len(vulns)} vulnerabilities:')
-        for vuln in vulns:
-            print(vuln)
+from analyser import Analyser
 
 if __name__ == '__main__':
     if len(sys.argv) != 1 + 2:
@@ -21,4 +11,6 @@ if __name__ == '__main__':
     program = read_program(sys.argv[1])
     patterns = read_vulnerability_patterns(sys.argv[2])
 
-    analyse(program, patterns)
+    analyser = Analyser(program, patterns)
+    analyser.run()
+    analyser.report_vulns()
