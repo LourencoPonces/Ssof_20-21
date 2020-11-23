@@ -23,6 +23,9 @@ Se assim o for, porque e que e precisa a lista de sources?
 6. Source e sink de vulnerabilidades diferentes geram uma vulnerabilidade?
     Nao
 
+7. Porque e que precisamos de `sinks` no Taint? Eles so sao preenchidos quando criamos uma vulnerabilidade
+    A vulnerabilidade ate podia ser criada com uma taint (que por sua vez tinha as informacoes de source e sanitizers)
+
 ## Ideas
 
 ### Idea 1:
