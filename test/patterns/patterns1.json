@@ -1,4 +1,9 @@
 [
+    {"vulnerability": "Generic Vulnerability",
+    "sources": ["source", "a", "b", "c"],
+    "sanitizers": ["sanitizer"],
+    "sinks": ["sink", "x", "y", "z"]},
+
     {"vulnerability": "Command Injection",
     "sources": ["readline","req.headers","file_path"],
     "sanitizers": ["escape", "sanitize"],
