@@ -110,6 +110,6 @@ class Analyser:
         if len(self.vulnerabilities) == 0:
             print('No vulnerabilities found!')
         else:
-            print(f'Found {len(self.vulnerabilities)} vulnerabilities:')
+            print(f'Found vulnerabilities: {len(self.vulnerabilities)}')
             for vuln in self.vulnerabilities:
                 print(vuln)
