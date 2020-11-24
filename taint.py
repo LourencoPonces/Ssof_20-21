@@ -22,6 +22,6 @@ class Taint:
             'value': self.value,
             'sources': self.initial_sources,
             'sanitizers': self.sanitizers,
-            'sinks': self.sinks
+            # 'sinks': self.sinks
         }
         return d.__repr__()

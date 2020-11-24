@@ -65,12 +65,15 @@ class Analyser:
         
 
         if len(tainted_args) > 0:
-            #  TODO: flaten this
-            initial_sources = tuple(tainted_arg['taint'].get_initial_sources() for tainted_arg in tainted_args)
-            sanitizers = tuple(tainted_arg['taint'].get_sanitizers() for tainted_arg in tainted_args)
+            initial_sources = ()
+            sanitizers = ()
+            # avoid nested tuples
+            for tainted_arg in tainted_args:
+                initial_sources += tainted_arg['taint'].get_initial_sources()
+                sanitizers += tainted_arg['taint'].get_sanitizers()
 
             # calculate sources, path, etc
-            call_node['taint'] = Taint(value = True, initial_sources = initial_sources, sanitizers = sanitizers, sinks = "TODO")
+            call_node['taint'] = Taint(value = True, initial_sources = initial_sources, sanitizers = sanitizers)
 
             # TODO: We need to consider multiple sources in a single sink:
             # sink(source1, source2) will have to report 2 vulnerabilities
@@ -135,7 +138,7 @@ class Analyser:
             name: string;
         '''
         name = identifier_node['name']
-        print(f'Identifier: {name}')
+        print(f'Identifier: "{name}"')
         identifier_node['taint'] = Taint(value = True, initial_sources = (name,), sanitizers = (), sinks = ())
 
         # used above in recursion to find the full name (e.g. MemberExpression)
