@@ -10,9 +10,16 @@ Static Analysis Techniques
 ## Questions
 
 1. Pode haver sinks que nao sejam function calls?
+    SIM! document.innerHTML -> XSS
+
 2. Quando e que há efectivamente uma vulnerabilidade? Source e depois sink ou também Source, Sanitizer, Sink?
+    Temos de reportar tudo porque nao temos a certeza se os sanitizers estao corretos
+
 3. O que é que gera taint ao certo? `a = func()` é tainted? Qaundo func é uma função desconhecida, não declarada
+    *semelhante a resposta em 5*
+
 4. program8.js -> vuln nas linhas 1 e 2
+
 5. Uma variavel desconhecida no programa e uma source? Caso sim, essa source da origem a uma vulnerabilidade com qualquer sink?
 ex: aqui o `a` nunca foi declarado. Mesmo que ele nao exista nos `sources`, e considerado como source?
 ```
@@ -20,11 +27,19 @@ sink(a)
 ```
 Se assim o for, porque e que e precisa a lista de sources?
 
+    assumimos que a slice produzida tem toda a informacao relevante
+    portanto so assumimos que esta tainted se for source ou estiver tainted
+
 6. Source e sink de vulnerabilidades diferentes geram uma vulnerabilidade?
     Nao
 
 7. Porque e que precisamos de `sinks` no Taint? Eles so sao preenchidos quando criamos uma vulnerabilidade
-    A vulnerabilidade ate podia ser criada com uma taint (que por sua vez tinha as informacoes de source e sanitizers)
+A vulnerabilidade ate podia ser criada com uma taint (que por sua vez tinha as informacoes de source e sanitizers)
+
+8. Precisamos de ser mais precisos e de separar as vulnerabilidades em diferentes vulns, mas pode haver mais do que um sink numa vuln?
+    "ha uns flows que podem ser sanitizados e outros que nao sao, por isso e que se introduziu 
+    (nao percebi bem esta parte)"
+Nao percebi bem... Prefiro perguntar em horario de duvidas
 
 ## Ideas
 
