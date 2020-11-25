@@ -41,6 +41,8 @@ A vulnerabilidade ate podia ser criada com uma taint (que por sua vez tinha as i
     (nao percebi bem esta parte)"
 Nao percebi bem... Prefiro perguntar em horario de duvidas
 
+9. Os sanitizers podem ser outra coisa que nao funcoes?
+
 ## Ideas
 
 ### Idea 1:
