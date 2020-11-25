@@ -6,7 +6,7 @@ class Analyser:
         self.program = program              # the program to analyse        JSON
         self.patterns = patterns            # the patterns to consider      [Pattern, ...]
         self.vulnerabilities = []           # register vulnerabilities      [Vulnerability, ...]
-        self.variable_flows = {}                 # found variables               {Variable : Taint/Source?, ...}
+        self.variable_flows = {}            # found variables               {Variable : Taint/Source?, ...}
 
     def is_source(self, potential):
         res_patts = []
@@ -72,11 +72,16 @@ class Analyser:
         tainted_args = []
         for argument in arguments:
             self.dispatcher(argument)
-            if argument['taint'].is_tainted():
+            if argument['flow'].is_tainted():
                 tainted_args += [argument]
         
+        flow = Flow([argument['flow'] for argument in arguments])
+        call_node['flow'] = flow
 
-        if len(tainted_args) > 0:
+        self.vulnerabilities += flow.check_sink(callee['full_name'])
+
+        """ 
+        if len(tainted_args) > 0 and flow.check_sink(callee['full_name']):
             initial_sources = ()
             sanitizers = ()
             # avoid nested tuples
@@ -96,7 +101,7 @@ class Analyser:
                 print("FOUND VULNERABILITY!!!!!!!!!!!!!!!")
 
             # TODO: verify if it is sanitizer
-
+        """
     def analyse_assignment(self, assignment_node):
         '''
             type: 'AssigmentExpression';

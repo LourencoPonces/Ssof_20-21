@@ -1,6 +1,6 @@
-a = source + source2
-b = a
-c = b
-sink(c)
+v1 = source
+v2 = v1
+v3 = v2
+sink(v3)
 
-// c -> b -> a -> source1, source2
+// v3 -> v2 -> v1 -> source
