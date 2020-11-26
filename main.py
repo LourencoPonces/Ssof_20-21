@@ -17,5 +17,11 @@ if __name__ == '__main__':
         patterns.append(Pattern(patt))
 
     analyser = Analyser(program, patterns)
-    analyser.run()
-    analyser.report_vulns()
+    vulnerabilities = analyser.run()
+
+    if len(vulnerabilities) == 0:
+        print('No vulnerabilities found!')
+    else:
+        print(f'Found vulnerabilities: {len(vulnerabilities)}')
+        for vuln in vulnerabilities:
+            print(vuln)

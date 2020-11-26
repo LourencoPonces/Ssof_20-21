@@ -47,6 +47,7 @@ class Analyser:
 
     def run(self):
         self.dispatcher(self.program)
+        return self.vulnerabilities
 
     def dispatcher(self, node):
         table = {
@@ -191,10 +192,3 @@ class Analyser:
 
         literal_node['full_name'] = literal_node['raw']
 
-    def report_vulns(self):
-        if len(self.vulnerabilities) == 0:
-            print('No vulnerabilities found!')
-        else:
-            print(f'Found vulnerabilities: {len(self.vulnerabilities)}')
-            for vuln in self.vulnerabilities:
-                print(vuln)
