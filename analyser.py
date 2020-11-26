@@ -31,6 +31,20 @@ class Analyser:
                 res_patts.append(patt)
         return res_patts
 
+
+    def get_identifier_flow(self, identifier):
+        if identifier in self.variable_flows:
+            flow = self.variable_flows[identifier]
+        else:
+            vuln_patterns = self.is_source(identifier) 
+            if len(vuln_patterns) != 0:
+                flow = Flow([Source(identifier = identifier, patterns = vuln_patterns)])
+            else:
+                flow = Flow([])
+
+        return flow
+
+
     def run(self):
         self.dispatcher(self.program)
 
@@ -142,22 +156,14 @@ class Analyser:
         self.dispatcher(property)
 
         if member_node['computed']:
-            print(f"Member Expression: {object['full_name']}[{property['full_name']}]")
-            member_node['full_name'] = f"{object['full_name']}[{property['full_name']}]"    # a[1]
-            full_name = member_node['full_name']
+            full_name = f"{object['full_name']}[{property['full_name']}]"    # a[1]
         else:
-            print(f"MemberExpression: {object['full_name']}.{property['full_name']}")
-            member_node['full_name'] = f"{object['full_name']}.{property['full_name']}"     # a.b
-            full_name = member_node['full_name']
-        
-        if full_name not in self.variable_flows:
-            patts = self.is_source(full_name)
-            if len(patts) != 0:
-                member_node['flow'] = Flow([Source(identifier = full_name, patterns = patts)])
-            else:
-                identifier_node['flow'] = Flow([])
-        else:
-            member_node['flow'] = self.variable_flows[full_name]
+            full_name = f"{object['full_name']}.{property['full_name']}"     # a.b
+
+        member_node['full_name'] = full_name
+        debug(f"Member Expression: {full_name}", self.depth)
+
+        member_node['flow'] = self.get_identifier_flow(full_name)
 
     def analyse_identifier(self, identifier_node):
         '''
@@ -167,19 +173,11 @@ class Analyser:
         name = identifier_node['name']
         debug(f'Identifier: "{name}"', self.depth)
 
-        if name not in self.variable_flows:
-            patts = self.is_source(name)
-            if len(patts) != 0:
-                identifier_node['flow'] = Flow([Source(identifier = name, patterns = patts)])
-            else:
-                identifier_node['flow'] = Flow([])
-            # Has to account for it being a function call
-            # self.variable_flows[name] = identifier_node['flow']
-        else:
-            identifier_node['flow'] = self.variable_flows[name]
-
         # used above in recursion to find the full name (e.g. MemberExpression)
         identifier_node['full_name'] = name
+
+        identifier_node['flow'] = self.get_identifier_flow(name)
+
 
     def analyse_literal(self, literal_node):
         '''
