@@ -1,4 +1,5 @@
 from flow import Flow
+from util import debug
 from source import Source
 
 class Analyser:
@@ -7,6 +8,7 @@ class Analyser:
         self.patterns = patterns            # the patterns to consider      [Pattern, ...]
         self.vulnerabilities = []           # register vulnerabilities      [Vulnerability, ...]
         self.variable_flows = {}                 # found variables               {Variable : Taint/Source?, ...}
+        self.depth = 0
 
     def is_source(self, potential):
         res_patts = []
@@ -46,7 +48,10 @@ class Analyser:
 
         node_type = node['type']
         if node_type in table:
+            self.depth = self.depth + 1
+            debug(f'Visiting {node_type}', self.depth)
             table[node_type](node)
+            self.depth -= 1
         else:
             print(f'Node {node_type} not recognized')
 
@@ -111,14 +116,14 @@ class Analyser:
         self.dispatcher(left)
         self.dispatcher(right)
         
-        print(f"AssignmentExpression: {left['full_name']} {operator} {right['full_name']}")
+        debug(f"AssignmentExpression: {left['full_name']} {operator} {right['full_name']}", self.depth)
 
         # Assignment node gets flow from right
         flow = Flow([right['flow']])
         assignment_node['flow'] = flow
         
         # Variable from left gets flow from right
-        # NOTE: left node doesnt need to get the flow from right
+        # NOTE: left node doesn't need to get the flow from right
         self.variable_flows[left['full_name']] = flow
         
         # Check if left is sink
@@ -178,7 +183,7 @@ class Analyser:
             name: string;
         '''
         name = identifier_node['name']
-        print(f'Identifier: "{name}"')
+        debug(f'Identifier: "{name}"', self.depth)
 
         if name not in self.variable_flows:
             patts = self.is_source(name)
