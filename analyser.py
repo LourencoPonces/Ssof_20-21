@@ -71,37 +71,19 @@ class Analyser:
         '''
         callee = call_node['callee']
         arguments = call_node['arguments']
-        # magic
         self.dispatcher(callee)
         
-        tainted_args = []
+        argument_flows = []
         for argument in arguments:
             self.dispatcher(argument)
-            if argument['taint'].is_tainted():
-                tainted_args += [argument]
+            argument_flows.append(argument['flow'])
+
+        # Functions pass the flow from their arguments
+        arg_flow = Flow(argument_flows)
+        call_node['flow'] = arg_flow
+
+        self.vulnerabilities += arg_flow.check_sink(callee['full_name'])
         
-
-        if len(tainted_args) > 0:
-            initial_sources = ()
-            sanitizers = ()
-            # avoid nested tuples
-            for tainted_arg in tainted_args:
-                initial_sources += tainted_arg['taint'].get_initial_sources()
-                sanitizers += tainted_arg['taint'].get_sanitizers()
-
-            # calculate sources, path, etc
-            # call_node['taint'] = Taint(value = True, initial_sources = initial_sources, sanitizers = sanitizers)
-
-            # TODO: We need to consider multiple sources in a single sink:
-            # sink(source1, source2) will have to report 2 vulnerabilities
-
-            if len(self.is_sink(callee['full_name'])) != 0:
-                sink = callee['full_name']
-                self.vulnerabilities += [call_node]
-                print("FOUND VULNERABILITY!!!!!!!!!!!!!!!")
-
-            # TODO: verify if it is sanitizer
-
     def analyse_assignment(self, assignment_node):
         '''
             type: 'AssigmentExpression';
