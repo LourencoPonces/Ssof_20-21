@@ -62,8 +62,8 @@ class Analyser:
 
         node_type = node['type']
         if node_type in table:
-            self.depth = self.depth + 1
             debug(f'Visiting {node_type}', self.depth)
+            self.depth = self.depth + 1
             table[node_type](node)
             self.depth -= 1
         else:
