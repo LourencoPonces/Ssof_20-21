@@ -14,6 +14,9 @@ class Flow:
             # Some of these flows might be a Source. Magic...
             self.sources += flow.get_sources()
 
+    def __repr__(self):
+        return f'<Flow from {self.sources.__repr__()}>'
+
     def is_tainted(self):
         return len(self.sources) > 0
 
