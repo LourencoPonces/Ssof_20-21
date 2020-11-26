@@ -5,6 +5,9 @@ class Source:
         self.identifier = identifier  # Source identifier (String)
         self.patterns = patterns      # [Pattern , ...]
 
+    def __repr__(self):
+        return f"<Source: {self.identifier}>"
+
     # Used by Flow
     def get_sources(self):
         return [self]
