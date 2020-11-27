@@ -187,7 +187,7 @@ class Analyser:
             raw: string;
         '''
         value = literal_node["value"]
-        print(f'Literal: {value}')
+        debug(f'Literal: {value}', self.depth)
         literal_node['flow'] = Flow([])
 
         literal_node['full_name'] = literal_node['raw']
