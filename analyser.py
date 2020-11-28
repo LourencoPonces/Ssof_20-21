@@ -36,9 +36,12 @@ class Analyser:
     def dispatcher(self, node):
         table = {
             'Program':                  self.analyse_program,
-            'ExpressionStatement':      self.analyse_expression,
-            'CallExpression':           self.analyse_call,
-            'AssignmentExpression':     self.analyse_assignment,
+            'WhileStatement':           self.analyse_while_statement,
+            'IfStatement':              self.analyse_if_statement,
+            'BlockStatement':           self.analyse_block_statement,
+            'ExpressionStatement':      self.analyse_expression_statement,
+            'CallExpression':           self.analyse_call_expression,
+            'AssignmentExpression':     self.analyse_assignment_expression,
             'BinaryExpression':         self.analyse_binary_expression,
             'MemberExpression':         self.analyse_member_expression,
             'Identifier':               self.analyse_identifier,
@@ -59,10 +62,67 @@ class Analyser:
             # print(instruction)
             self.dispatcher(instruction)
 
-    def analyse_expression(self, expression_node):
-        self.dispatcher(expression_node['expression'])
+    def analyse_while_statement(self, while_node):
+        '''
+            type: 'WhileStatement';
+            test: Expression;
+            body: Statement;
+        '''
+        return
 
-    def analyse_call(self, call_node):
+    def analyse_if_statement(self, if_node):
+        '''
+            type: 'IfStatement';
+            test: Expression;
+            consequent: Statement;
+            alternate?: Statement;
+        '''
+        test = if_node['test']
+        consequent = if_node['consequent']
+        alternate = if_node['alternate']
+        self.dispatcher(test)
+        self.dispatcher(consequent)
+        self.dispatcher(alternate)
+        if_full_name = '\n' + '  ' * (self.depth + 3) + f"if({test['full_name']}) {consequent['full_name']}"
+        if alternate != 'null':
+            if_full_name += '\n' + '  ' * (self.depth + 3) + f"else {alternate['full_name']}"
+
+        debug(f"IfStatement: {if_full_name}", self.depth)
+
+        if_node['full_name'] = if_full_name
+
+    def analyse_block_statement(self, block_node):
+        '''
+            type: 'BlockStatement';
+            body: StatementListItem[];
+        '''
+        statements = block_node['body']
+
+        statement_flows = []
+        block_full_name = '\n' + '  ' * (self.depth + 3) + '{\n'
+        for statement in statements:
+            self.dispatcher(statement)
+            statement_flows.append(statement['flow'])
+            block_full_name += '  ' * (self.depth + 3) + '    ' + statement['full_name'] + '\n'
+        block_full_name += '  ' * (self.depth + 3) + '}'
+
+        debug(f"BlockStatement: {block_full_name}", self.depth)
+
+        block_node['flow'] = Flow(statement_flows)
+        block_node['full_name'] = block_full_name
+
+    def analyse_expression_statement(self, expression_node):
+        '''
+            type: 'ExpressionStatement';
+            expression: Expression;
+            directive?: string;
+        '''
+        self.dispatcher(expression_node['expression'])
+        debug(f"ExpressionStatement: {expression_node['expression']['full_name']}", self.depth)
+        expression_node['flow'] = Flow([expression_node['expression']['flow']])
+        expression_node['full_name'] = expression_node['expression']['full_name']
+
+    def analyse_call_expression(self, call_node):
         '''
             type: 'CallExpression';
             callee: Expression | Import;
@@ -89,7 +149,7 @@ class Analyser:
         flow.check_sanitizer(callee['full_name'], arguments)
         self.vulnerabilities += flow.check_sink(callee['full_name'])
         
-    def analyse_assignment(self, assignment_node):
+    def analyse_assignment_expression(self, assignment_node):
         '''
             type: 'AssigmentExpression';
             operator: '=' | '*=' | '**=' | '/=' | '%=' | '+=' | '-=' |'<<=' | '>>=' | '>>>=' | '&=' | '^=' | '|=';
@@ -127,7 +187,6 @@ class Analyser:
         left = binary_node['left']
         right = binary_node['right']
         operator = binary_node['operator']
-        print(f"BinaryExpression: {left['full_name']} {operator} {right['full_name']}")
         self.dispatcher(left)
         self.dispatcher(right)
 
