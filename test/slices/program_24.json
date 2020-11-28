@@ -1,0 +1,80 @@
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "name": "a1"
+        },
+        "right": {
+          "type": "Identifier",
+          "name": "srcA1"
+        }
+      }
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "name": "a2"
+        },
+        "right": {
+          "type": "Identifier",
+          "name": "srcA2"
+        }
+      }
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "name": "a1"
+        },
+        "right": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "sanA1"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "a1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "CallExpression",
+        "callee": {
+          "type": "Identifier",
+          "name": "snkA1"
+        },
+        "arguments": [
+          {
+            "type": "Identifier",
+            "name": "a1"
+          },
+          {
+            "type": "Identifier",
+            "name": "a2"
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}

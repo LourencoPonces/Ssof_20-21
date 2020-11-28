@@ -1,0 +1,15 @@
+[
+    {
+      "vulnerability": "VulnA",
+      "sources": [
+        "srcA1",
+        "srcA2"
+      ],
+      "sanitizers": [
+        "sanA1"
+      ],
+      "sinks": [
+        "snkA1"
+      ]
+    }
+  ]
