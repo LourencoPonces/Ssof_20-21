@@ -1,21 +1,46 @@
 import sys
+import json
+from pathlib import Path
 
-from util import fatal
+from util import *
 from pattern import Pattern
 from analyser import Analyser
 from read_files import read_vulnerability_patterns, read_program
 
-if __name__ == '__main__':
-    if len(sys.argv) != 1 + 2:
-        fatal(f'Usage: {sys.argv[0]} <program.json> <patterns.json>')
+def go(program_path, pattern_path):
+    if not (program_path.exists() and program_path.is_file()):
+        fatal(f'given program file does not exist')
 
-    program = read_program(sys.argv[1])
-    patterns_json = read_vulnerability_patterns(sys.argv[2])
+    if not (pattern_path.exists() and pattern_path.is_file()):
+        fatal(f'given pattern file does not exist')
+
+    output_path = get_out_filepath(program_path)
+
+    program = read_program(program_path)
+    patterns_json = read_vulnerability_patterns(pattern_path)
     patterns = []
 
     for patt in patterns_json:
         patterns.append(Pattern(patt))
 
     analyser = Analyser(program, patterns)
-    analyser.run()
-    analyser.report_vulns()
+    vulnerabilities = analyser.run()
+
+    json_vulns = json.dumps([vuln.to_dict() for vuln in vulnerabilities], indent=2)
+    output_path.write_text(json_vulns)
+
+    debug(f'Found vulnerabilities: {len(vulnerabilities)}')
+    for vuln in json_vulns:
+        debug(vuln)
+
+    # may be used by tester program
+    return vulnerabilities
+
+if __name__ == '__main__':
+    if len(sys.argv) != 1 + 2:
+        fatal(f'Usage: {sys.argv[0]} <program.json> <patterns.json>')
+
+    program_path = Path(sys.argv[1]).resolve()
+    pattern_path = Path(sys.argv[2]).resolve()
+
+    go(program_path, pattern_path)

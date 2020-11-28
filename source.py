@@ -5,6 +5,9 @@ class Source:
         self.identifier = identifier  # Source identifier (String)
         self.patterns = patterns      # [Pattern , ...]
 
+    def __repr__(self):
+        return f"<Source: {self.identifier}>"
+
     # Used by Flow
     def get_sources(self):
         return [self]
@@ -18,3 +21,11 @@ class Source:
             if pattern.detect_sink(sink_name):
                 patterns.append(pattern)
         return patterns
+
+    def __repr__(self):
+        obj = {
+            'type': 'source',
+            'identifier': self.identifier,
+            'patterns': [pattern.get_name() for pattern in self.patterns]
+        }
+        return obj.__repr__()

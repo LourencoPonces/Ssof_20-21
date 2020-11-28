@@ -1,4 +1,5 @@
 from flow import Flow
+from util import debug
 from source import Source
 
 class Analyser:
@@ -7,6 +8,7 @@ class Analyser:
         self.patterns = patterns            # the patterns to consider      [Pattern, ...]
         self.vulnerabilities = []           # register vulnerabilities      [Vulnerability, ...]
         self.variable_flows = {}            # found variables               {Variable : Taint/Source?, ...}
+        self.depth = 0
 
     def is_source(self, potential):
         res_patts = []
@@ -29,8 +31,23 @@ class Analyser:
                 res_patts.append(patt)
         return res_patts
 
+
+    def get_identifier_flow(self, identifier):
+        if identifier in self.variable_flows:
+            flow = self.variable_flows[identifier]
+        else:
+            vuln_patterns = self.is_source(identifier) 
+            if len(vuln_patterns) != 0:
+                flow = Flow([Source(identifier = identifier, patterns = vuln_patterns)])
+            else:
+                flow = Flow([])
+
+        return flow
+
+
     def run(self):
         self.dispatcher(self.program)
+        return self.vulnerabilities
 
     def dispatcher(self, node):
         table = {
@@ -46,7 +63,10 @@ class Analyser:
 
         node_type = node['type']
         if node_type in table:
+            debug(f'Visiting {node_type}', self.depth)
+            self.depth = self.depth + 1
             table[node_type](node)
+            self.depth -= 1
         else:
             print(f'Node {node_type} not recognized')
 
@@ -66,42 +86,24 @@ class Analyser:
         '''
         callee = call_node['callee']
         arguments = call_node['arguments']
-        # magic
         self.dispatcher(callee)
         
-        tainted_args = []
+        argument_flows = []
+        arguments_full_name = ''
         for argument in arguments:
             self.dispatcher(argument)
-            if argument['flow'].is_tainted():
-                tainted_args += [argument]
-        
-        flow = Flow([argument['flow'] for argument in arguments])
+            argument_flows.append(argument['flow'])
+            arguments_full_name += argument['full_name'] + ', '
+
+        debug(f"CallExpression: {callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})")
+
+        # Functions pass the flow from their arguments
+        flow = Flow(callee['flow'] + argument_flows)
         call_node['flow'] = flow
+        call_node['full_name'] = f"{callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})"
 
         self.vulnerabilities += flow.check_sink(callee['full_name'])
-
-        """ 
-        if len(tainted_args) > 0 and flow.check_sink(callee['full_name']):
-            initial_sources = ()
-            sanitizers = ()
-            # avoid nested tuples
-            for tainted_arg in tainted_args:
-                initial_sources += tainted_arg['taint'].get_initial_sources()
-                sanitizers += tainted_arg['taint'].get_sanitizers()
-
-            # calculate sources, path, etc
-            # call_node['taint'] = Taint(value = True, initial_sources = initial_sources, sanitizers = sanitizers)
-
-            # TODO: We need to consider multiple sources in a single sink:
-            # sink(source1, source2) will have to report 2 vulnerabilities
-
-            if len(self.is_sink(callee['full_name'])) != 0:
-                sink = callee['full_name']
-                self.vulnerabilities += [call_node]
-                print("FOUND VULNERABILITY!!!!!!!!!!!!!!!")
-
-            # TODO: verify if it is sanitizer
-        """
+        
     def analyse_assignment(self, assignment_node):
         '''
             type: 'AssigmentExpression';
@@ -116,14 +118,15 @@ class Analyser:
         self.dispatcher(left)
         self.dispatcher(right)
         
-        print(f"AssignmentExpression: {left['full_name']} {operator} {right['full_name']}")
+        debug(f"AssignmentExpression: {left['full_name']} {operator} {right['full_name']}", self.depth)
 
         # Assignment node gets flow from right
         flow = Flow([right['flow']])
         assignment_node['flow'] = flow
+        assignment_node['full_name'] = f"{left['full_name']} {operator} {right['full_name']}"
         
         # Variable from left gets flow from right
-        # NOTE: left node doesnt need to get the flow from right
+        # NOTE: left node doesn't need to get the flow from right
         self.variable_flows[left['full_name']] = flow
         
         # Check if left is sink
@@ -160,22 +163,14 @@ class Analyser:
         self.dispatcher(property)
 
         if member_node['computed']:
-            print(f"Member Expression: {object['full_name']}[{property['full_name']}]")
-            member_node['full_name'] = f"{object['full_name']}[{property['full_name']}]"    # a[1]
-            full_name = member_node['full_name']
+            full_name = f"{object['full_name']}[{property['full_name']}]"    # a[1]
         else:
-            print(f"MemberExpression: {object['full_name']}.{property['full_name']}")
-            member_node['full_name'] = f"{object['full_name']}.{property['full_name']}"     # a.b
-            full_name = member_node['full_name']
-        
-        if full_name not in self.variable_flows:
-            patts = self.is_source(full_name)
-            if len(patts) != 0:
-                member_node['flow'] = Flow([Source(identifier = full_name, patterns = patts)])
-            else:
-                identifier_node['flow'] = Flow([])
-        else:
-            member_node['flow'] = self.variable_flows[full_name]
+            full_name = f"{object['full_name']}.{property['full_name']}"     # a.b
+
+        member_node['full_name'] = full_name
+        debug(f"Member Expression: {full_name}", self.depth)
+
+        member_node['flow'] = self.get_identifier_flow(full_name)
 
     def analyse_identifier(self, identifier_node):
         '''
@@ -183,21 +178,13 @@ class Analyser:
             name: string;
         '''
         name = identifier_node['name']
-        print(f'Identifier: "{name}"')
-
-        if name not in self.variable_flows:
-            patts = self.is_source(name)
-            if len(patts) != 0:
-                identifier_node['flow'] = Flow([Source(identifier = name, patterns = patts)])
-            else:
-                identifier_node['flow'] = Flow([])
-            # Has to account for it being a function call
-            # self.variable_flows[name] = identifier_node['flow']
-        else:
-            identifier_node['flow'] = self.variable_flows[name]
+        debug(f'Identifier: "{name}"', self.depth)
 
         # used above in recursion to find the full name (e.g. MemberExpression)
         identifier_node['full_name'] = name
+
+        identifier_node['flow'] = self.get_identifier_flow(name)
+
 
     def analyse_literal(self, literal_node):
         '''
@@ -206,15 +193,8 @@ class Analyser:
             raw: string;
         '''
         value = literal_node["value"]
-        print(f'Literal: {value}')
+        debug(f'Literal: {value}', self.depth)
         literal_node['flow'] = Flow([])
 
         literal_node['full_name'] = literal_node['raw']
 
-    def report_vulns(self):
-        if len(self.vulnerabilities) == 0:
-            print('No vulnerabilities found!')
-        else:
-            print(f'Found vulnerabilities: {len(self.vulnerabilities)}')
-            for vuln in self.vulnerabilities:
-                print(vuln)

@@ -14,6 +14,9 @@ class Flow:
             # Some of these flows might be a Source. Magic...
             self.sources += flow.get_sources()
 
+    def __repr__(self):
+        return f'<Flow from {self.sources.__repr__()}>'
+
     def is_tainted(self):
         return len(self.sources) > 0
 
@@ -48,3 +51,12 @@ class Flow:
             vuln = Vulnerability(name, sources, sanitizers, sinks)
             vulns.append(vuln)
         return vulns
+
+    
+    def __repr__(self):
+        obj = {
+            'type': 'flow',
+            'previous_flows': [flow for flow in self.previous_flows],
+            'sources': [source for source in self.sources]
+        }
+        return obj.__repr__()

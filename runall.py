@@ -1,0 +1,58 @@
+import sys
+from pathlib import Path
+
+from main import go
+from util import *
+from read_files import read_json
+
+
+PASSED = 0
+FAILED = 1
+NO_OUT = 2
+NO_EXP = 3
+
+
+
+def verify_output(program_path):
+    out_path = get_out_filepath(program_path)
+    exp_path = get_expected_filepath(program_path)
+
+    if not out_path.exists():
+        return NO_OUT
+    
+    if not exp_path.exists():
+        return NO_EXP
+
+    out = read_json(out_path)
+    exp = read_json(exp_path)
+    return PASSED if sort_dict(out) == sort_dict(exp) else FAILED
+
+if __name__ == '__main__':
+    debugging = False
+    if len(sys.argv) != 1 + 2:
+        fatal(f'Usage: {sys.argv[0]} <program_directory> <patterns.json>')
+
+    slices_path = Path(sys.argv[1])#.resolve()
+    pattern_path = Path(sys.argv[2])#.resolve()
+
+    if not (slices_path.exists() and slices_path.is_dir()):
+        fatal(f'given program directory does not exist')
+
+    if not (pattern_path.exists() and pattern_path.is_file()):
+        fatal(f'given pattern file does not exist')
+
+    slices = [f for f in slices_path.iterdir() if f.suffix == '.json' or len(f.suffixes) != 1]
+    slices.sort()
+    for slice_path in slices:
+
+        go(slice_path, pattern_path)
+
+        result = verify_output(slice_path)
+        if result == PASSED:
+            print("PASSED")
+        elif result == FAILED:
+            print("FAILED")
+        elif result == NO_OUT:
+            print("No output file")
+        elif result == NO_EXP:
+            print("No exp file")
