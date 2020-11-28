@@ -1,0 +1,22 @@
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "CallExpression",
+        "callee": {
+          "type": "Identifier",
+          "name": "sink"
+        },
+        "arguments": [
+          {
+            "type": "Identifier",
+            "name": "undefined_variable"
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}

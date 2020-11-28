@@ -1,2 +1,2 @@
-// must report 2 vulnerabilities
-sink(source1, source2)
+// must report 1 vulnerability
+sink(src1, src2)

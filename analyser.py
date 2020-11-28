@@ -17,21 +17,6 @@ class Analyser:
                 res_patts.append(patt)
         return res_patts
 
-    def is_sanitizer(self, potential):
-        res_patts = []
-        for patt in self.patterns:
-            if patt.detect_sanitizer(potential):
-                res_patts.append(patt)
-        return res_patts
-
-    def is_sink(self, potential):
-        res_patts = []
-        for patt in self.patterns:
-            if patt.detect_sink(potential):
-                res_patts.append(patt)
-        return res_patts
-
-
     def get_identifier_flow(self, identifier):
         if identifier in self.variable_flows:
             flow = self.variable_flows[identifier]
@@ -43,7 +28,6 @@ class Analyser:
                 flow = Flow([])
 
         return flow
-
 
     def run(self):
         self.dispatcher(self.program)
@@ -95,13 +79,14 @@ class Analyser:
             argument_flows.append(argument['flow'])
             arguments_full_name += argument['full_name'] + ', '
 
-        debug(f"CallExpression: {callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})")
+        debug(f"CallExpression: {callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})", self.depth)
 
         # Functions pass the flow from their arguments
-        flow = Flow(callee['flow'] + argument_flows)
+        flow = Flow([callee['flow']] + argument_flows)
         call_node['flow'] = flow
         call_node['full_name'] = f"{callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})"
 
+        flow.check_sanitizer(callee['full_name'], arguments)
         self.vulnerabilities += flow.check_sink(callee['full_name'])
         
     def analyse_assignment(self, assignment_node):
@@ -184,7 +169,6 @@ class Analyser:
         identifier_node['full_name'] = name
 
         identifier_node['flow'] = self.get_identifier_flow(name)
-
 
     def analyse_literal(self, literal_node):
         '''

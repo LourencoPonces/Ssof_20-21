@@ -3,7 +3,6 @@ from pathlib import Path
 
 from main import go
 from util import *
-from read_files import read_json
 
 
 PASSED = 0
@@ -45,14 +44,18 @@ if __name__ == '__main__':
     slices.sort()
     for slice_path in slices:
 
+        out_path = get_out_filepath(slice_path)
+        if out_path.exists():
+            out_path.unlink()
+
         go(slice_path, pattern_path)
 
         result = verify_output(slice_path)
         if result == PASSED:
-            print("PASSED")
+            print(f"{slice_path} PASSED")
         elif result == FAILED:
-            print("FAILED")
+            print(f"{slice_path} FAILED")
         elif result == NO_OUT:
-            print("No output file")
+            print(f"{slice_path} No output file")
         elif result == NO_EXP:
-            print("No exp file")
+            print(f"{slice_path} No exp file")

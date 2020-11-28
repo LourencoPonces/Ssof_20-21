@@ -8,11 +8,11 @@
         "operator": "=",
         "left": {
           "type": "Identifier",
-          "name": "v1"
+          "name": "a"
         },
         "right": {
           "type": "Identifier",
-          "name": "source"
+          "name": "src1"
         }
       }
     },
@@ -23,26 +23,20 @@
         "operator": "=",
         "left": {
           "type": "Identifier",
-          "name": "v2"
+          "name": "b"
         },
         "right": {
-          "type": "Identifier",
-          "name": "v1"
-        }
-      }
-    },
-    {
-      "type": "ExpressionStatement",
-      "expression": {
-        "type": "AssignmentExpression",
-        "operator": "=",
-        "left": {
-          "type": "Identifier",
-          "name": "v3"
-        },
-        "right": {
-          "type": "Identifier",
-          "name": "v2"
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "sanitizer"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "src2"
+            }
+          ]
         }
       }
     },
@@ -52,12 +46,16 @@
         "type": "CallExpression",
         "callee": {
           "type": "Identifier",
-          "name": "x"
+          "name": "sink"
         },
         "arguments": [
           {
             "type": "Identifier",
-            "name": "v3"
+            "name": "a"
+          },
+          {
+            "type": "Identifier",
+            "name": "b"
           }
         ]
       }

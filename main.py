@@ -30,8 +30,7 @@ def go(program_path, pattern_path):
     output_path.write_text(json_vulns)
 
     debug(f'Found vulnerabilities: {len(vulnerabilities)}')
-    for vuln in json_vulns:
-        debug(vuln)
+    debug(vulnerabilities)
 
     # may be used by tester program
     return vulnerabilities

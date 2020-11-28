@@ -1,0 +1,91 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "v1"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "source"
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "v2"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "v1"
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "v3"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "v2"
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "v4"
+          },
+          "right": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "sanitizer"
+            },
+            "arguments": [
+              {
+                "type": "Identifier",
+                "name": "v3"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "x"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "v4"
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }

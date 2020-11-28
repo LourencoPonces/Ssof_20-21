@@ -1,0 +1,74 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "source1"
+          },
+          "right": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "sanitizer"
+            },
+            "arguments": [
+              {
+                "type": "Identifier",
+                "name": "source1"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "source2"
+          },
+          "right": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "sanitizer"
+            },
+            "arguments": [
+              {
+                "type": "Identifier",
+                "name": "source2"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "sink"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "source1"
+            },
+            {
+              "type": "Identifier",
+              "name": "source2"
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }

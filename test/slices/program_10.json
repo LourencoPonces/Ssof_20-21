@@ -1,0 +1,22 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "exec"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "source"
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }

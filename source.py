@@ -11,6 +11,9 @@ class Source:
     # Used by Flow
     def get_sources(self):
         return [self]
+    
+    def get_sanitizers(self):
+        return {}
 
     def get_identifier(self):
         return self.identifier
@@ -19,6 +22,13 @@ class Source:
         patterns = []
         for pattern in self.patterns:
             if pattern.detect_sink(sink_name):
+                patterns.append(pattern)
+        return patterns
+    
+    def check_sanitizer(self, sanitizer_name):
+        patterns = []
+        for pattern in self.patterns:
+            if pattern.detect_sanitizer(sanitizer_name):
                 patterns.append(pattern)
         return patterns
 
