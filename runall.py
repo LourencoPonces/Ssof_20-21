@@ -27,7 +27,6 @@ def verify_output(program_path):
     return PASSED if sort_dict(out) == sort_dict(exp) else FAILED
 
 if __name__ == '__main__':
-    debugging = False
     if len(sys.argv) != 1 + 2:
         fatal(f'Usage: {sys.argv[0]} <program_directory> <patterns.json>')
 
@@ -42,6 +41,7 @@ if __name__ == '__main__':
 
     slices = [f for f in slices_path.iterdir() if f.suffix == '.json' or len(f.suffixes) != 1]
     slices.sort()
+    passed = 0
     for slice_path in slices:
 
         out_path = get_out_filepath(slice_path)
@@ -52,6 +52,7 @@ if __name__ == '__main__':
 
         result = verify_output(slice_path)
         if result == PASSED:
+            passed += 1
             print(f"{slice_path} PASSED")
         elif result == FAILED:
             print(f"{slice_path} FAILED")
@@ -59,3 +60,5 @@ if __name__ == '__main__':
             print(f"{slice_path} No output file")
         elif result == NO_EXP:
             print(f"{slice_path} No exp file")
+
+    print(f"Passed {passed}/{len(slices)} ({100*passed/len(slices)}%)")
