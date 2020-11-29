@@ -24,4 +24,4 @@ class Pattern:
             'sanitizers': self.sanitizers,
             'sinks': self.sinks
         }
-        return obj.__repr__()
+        return f"<Pattern {self.name}>"
