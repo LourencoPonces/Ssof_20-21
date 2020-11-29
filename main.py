@@ -27,6 +27,7 @@ def go(program_path, pattern_path):
     vulnerabilities = analyser.run()
 
     json_vulns = json.dumps([vuln.to_dict() for vuln in vulnerabilities], indent=2)
+    debug(json_vulns)
     output_path.write_text(json_vulns)
 
     debug(f'Found vulnerabilities: {len(vulnerabilities)}')
