@@ -43,6 +43,26 @@ Nao percebi bem... Prefiro perguntar em horario de duvidas
 
 9. Os sanitizers podem ser outra coisa que nao funcoes?
 
+10. Um literal pode ser source/sink/sanitizer?
+
+11.
+a) lancamos vulnerabilidade em a, por f_1 poder fazer `snk1 = src1` ou `snk1(src1)`?
+b) na linha `sink(c)` devemos apresentar a vulnerabilidade com o sink `snk3`?
+c) os sanitizadores passados como argumentos passam no sanitizador?
+
+```
+a = f_1(src1, san1, snk1)
+b = src(src2, san2, snk2)
+c = snk(src3, san3, snk3) -> { V, sources:[src3], sinks:[snk], sanitizers: []}
+d = san(src4, san4, snk4)
+sink(a) -> { V, sources:[src1], sinks:[sink], sanitizers: [] }
+sink(b) -> { V, sources:[src, src2], sinks:[sink], sanitizers: [] }
+sink(c) -> { V, sources:[src3], sinks:[sink], sanitizers: [] }
+sink(d) -> { V, sources:[src4], sinks:[sink], sanitizers: [san] }
+```
+
+sanitizer(arguments)
+
 ## Ideas
 
 ### Idea 1:
@@ -62,3 +82,51 @@ Se tiver, reportamos essa vulnerabilidade
 
 # Patterns:
 
+Flow: 
+
+self.possible_patterns: {
+    'pattern_name': {
+        pattern: <Pattern>
+        sources: [ passed by these sources ]
+        sinks: [ passed by these sinks ]
+        sanitizers: [ passed by these sanitizers ]
+    }
+}
+
+
+1. 
+if(source) {
+    sink = true;
+} else {
+    sink = false;
+}
+
+2. 
+if(source ) {
+    a = true;
+} else {
+    a = false;
+}
+sink = a;
+
+(sinks, sources, sanitizers) + (sources)
+
+{vulnA, sinks: [a], sources: [src1]}
+{vulnB, sinks: [snk2], sources: [a]}
+
+v1 = a
+
+v1(src1)
+snk2(v1)
+
+{VulnA, [v1], [src1]} {VulnA, [snk2], [v1]}
+
+a = sink
+a = source
+
+b = sink
+b(source)
+
+
+sink1 = source
+sink2 = sink1
