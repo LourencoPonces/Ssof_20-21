@@ -168,7 +168,6 @@ class Analyser:
 
         call_flow = Flow([callee_flow, args_flow])
         call_node['flow'] = call_flow
-        debug(call_flow, self.depth)
 
         self.vulnerabilities += call_flow.check_vulns()
         
@@ -186,13 +185,12 @@ class Analyser:
         self.dispatcher(left)
         self.dispatcher(right)
 
-        # Is this needed? The program will crash if it is
-        # debug(f"AssignmentExpression: {left['full_name']} {operator} {right['full_name']}", self.depth)
-        # assignment_node['full_name'] = f"{left['full_name']} {operator} {right['full_name']}"
-
         # Assignment node gets flow from right
         right_flow = right['flow']
         left_flow  =  left['flow']
+
+        # we don't want to account for left sources: they will be overwritten
+        left_flow.remove_sources()
         resulting_flow = Flow([right_flow, left_flow])
         assignment_node['flow'] = Flow([right_flow])
         

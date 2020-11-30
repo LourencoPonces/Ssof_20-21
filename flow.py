@@ -48,16 +48,22 @@ class Flow:
     def remove_sinks(self):
         for tracked in self.tracked_patterns.values():
             tracked['sinks'] = []
+    
+    def remove_sources(self):
+        for tracked in self.tracked_patterns.values():
+            tracked['sources'] = []
 
     def check_vulns(self):
         vulns = []
         for pat_name, tracked in self.tracked_patterns.items():
             if len(tracked['sources']) > 0 and len(tracked['sinks']) > 0:
                 for sink in tracked['sinks']:
+                    # [:] makes a copy of the array, so the reported vuln isn't changed
+                    # after being reported
                     vuln_name = pat_name
-                    src = tracked['sources']
-                    san = tracked['sanitizers']
-                    snk = [sink]
+                    src = tracked['sources'][:]
+                    san = tracked['sanitizers'][:]
+                    snk = [sink][:]
                     vulns.append(Vulnerability(vuln_name, src, san, snk))
                 # clear already reported sinks
                 tracked['sinks'] = []

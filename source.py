@@ -2,6 +2,7 @@ from vulnerability import Vulnerability
 
 class Source:
     def __init__(self, identifier,  patterns = []):
+        self.identifier = identifier
         self.tracked_patterns = {}
         for pattern in patterns:
             pat_name = pattern.get_name()
@@ -14,6 +15,9 @@ class Source:
     
     def get_tracked_patterns(self):
         return self.tracked_patterns
+
+    def __repr__(self):
+        return f'<Source {self.identifier}, {len(self.tracked_patterns)}>'
 
     '''
     def get_sources(self):
