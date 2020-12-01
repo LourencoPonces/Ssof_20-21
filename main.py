@@ -5,7 +5,6 @@ from pathlib import Path
 from util import *
 from pattern import Pattern
 from analyser import Analyser
-from read_files import read_vulnerability_patterns, read_program
 
 def go(program_path, pattern_path):
     if not (program_path.exists() and program_path.is_file()):
@@ -16,8 +15,8 @@ def go(program_path, pattern_path):
 
     output_path = get_out_filepath(program_path)
 
-    program = read_program(program_path)
-    patterns_json = read_vulnerability_patterns(pattern_path)
+    program = read_json(program_path)
+    patterns_json = read_json(pattern_path)
     patterns = []
 
     for patt in patterns_json:
