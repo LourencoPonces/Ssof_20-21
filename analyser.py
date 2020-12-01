@@ -137,8 +137,6 @@ class Analyser:
             directive?: string;
         '''
         self.dispatcher(expression_node['expression'])
-        # debug(f"ExpressionStatement: {expression_node['expression']['full_name']}", self.depth)
-        # expression_node['full_name'] = expression_node['expression']['full_name']
         expression_node['flow'] = Flow([expression_node['expression']['flow']])
 
     def analyse_call_expression(self, call_node):
@@ -156,11 +154,8 @@ class Analyser:
         for argument in arguments:
             self.dispatcher(argument)
             argument_flows.append(argument['flow'])
-            # arguments_full_name += argument['full_name'] + ', '
         
-        # debug(f"CallExpression: {callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})", self.depth)
-        # call_node['full_name'] = f"{callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})"
-        
+
         callee_flow = callee['flow']
         args_flow = Flow(argument_flows)
         # args_flow.remove_sanitizers()
@@ -191,6 +186,7 @@ class Analyser:
 
         # we don't want to account for left sources: they will be overwritten
         left_flow.remove_sources()
+
         resulting_flow = Flow([right_flow, left_flow])
         assignment_node['flow'] = Flow([right_flow])
         

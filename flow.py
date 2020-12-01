@@ -18,7 +18,7 @@ class Flow:
             pats = flow.get_tracked_patterns()
             for pat_name, tracked in pats.items():
                 if pat_name not in self.tracked_patterns:
-                    self.tracked_patterns[pat_name] = tracked
+                    self.tracked_patterns[pat_name] = tracked.copy()
                 else:
                     # Pattern already exists. Adding unique sources/sinks/sanitizers
                     known_sources = self.tracked_patterns[pat_name]['sources']                    
