@@ -130,7 +130,7 @@ class Analyser:
         # flow resulting from the `then` statement
         consequent_flow = self.backup_flows()
 
-        if 'alternate' in if_node:
+        if if_node['alternate'] != None:
             # restore arrival flow
             self.variable_flows = previous_flow
             self.dispatcher(if_node['alternate'])
@@ -147,9 +147,6 @@ class Analyser:
         statement_flows = []
         for statement in statements:
             self.dispatcher(statement)
-            statement_flows.append(statement['flow'])
-
-        block_node['flow'] = Flow(statement_flows)
 
     def analyse_expression_statement(self, expression_node):
         '''
