@@ -78,7 +78,6 @@ class Analyser:
 
     def analyse_program(self, program_node):
         for instruction in program_node['body']:
-            # print(instruction)
             self.dispatcher(instruction)
 
     def analyse_while_statement(self, while_node):

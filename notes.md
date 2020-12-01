@@ -130,3 +130,8 @@ b(source)
 
 sink1 = source
 sink2 = sink1
+
+## TODOS
+Make bash script to prepare the outputs folder and other things
+Outputs sanitizers ands sinks in the wrong order
+Read files the 2 functions are similar
