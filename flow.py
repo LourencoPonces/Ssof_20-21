@@ -1,5 +1,6 @@
 from vulnerability import Vulnerability
 from itertools import product
+from copy import deepcopy
 
 class Flow:
     def __init__(self, previous_flows):
@@ -24,7 +25,7 @@ class Flow:
             for pat in combination:
                 for pat_name, tracked in pat.items():
                     if pat_name not in comb_pattern:
-                        comb_pattern[pat_name] = tracked.copy()
+                        comb_pattern[pat_name] = deepcopy(tracked)
                     else:
                         # Pattern already exists. Adding unique sources/sinks/sanitizers
                         known_sources = comb_pattern[pat_name]['sources']                    
@@ -43,7 +44,6 @@ class Flow:
                             if sanitizer not in known_sanitizers:
                                 known_sanitizers.append(sanitizer)
             self.tracked_patterns.append(comb_pattern)
-
 
     def get_tracked_patterns(self):
         return self.tracked_patterns
@@ -79,6 +79,10 @@ class Flow:
                     # clear already reported sinks
                     tracked['sinks'] = []
         return vulns
+
+    def merge(self, other_flow):
+        # TODO: avoid duplicate patterns
+        self.tracked_patterns += other_flow.get_tracked_patterns()[:]
 
     def __repr__(self):
         return f"<Flow {self.tracked_patterns}>"

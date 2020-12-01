@@ -53,6 +53,7 @@ class Analyser:
         for var, flow in self.variable_flows.items():
             res[var] = Flow([flow])
         return res
+    
     # vf_1 - variable flows 1
     # vf_2 - variable flows 2
     # total_v - set of every key in both dictionaries
@@ -66,7 +67,8 @@ class Analyser:
             elif v not in vf_2:
                 final_vf[v] = vf_1[v]
             else: 
-                final_vf[v] = Flow([vf_1[v], vf_2[v]])
+                final_vf[v] = Flow([vf_1[v]])
+                final_vf[v].merge(vf_2[v])
         return final_vf
 
     def run(self):
@@ -121,16 +123,19 @@ class Analyser:
         
         self.dispatcher(test)
 
+        # flow at if arrival
         previous_flow = self.backup_flows()
         self.dispatcher(consequent)
+
+        # flow resulting from the `then` statement
         consequent_flow = self.backup_flows()
 
-        
-
         if 'alternate' in if_node:
-            self.variable_flows = self.backup_flows()
-            alternate = if_node['alternate']
-            self.dispatcher(alternate)
+            # restore arrival flow
+            self.variable_flows = previous_flow
+            self.dispatcher(if_node['alternate'])
+        
+        self.variable_flows = self.merge_variable_flows(previous_flow, consequent_flow)
 
     def analyse_block_statement(self, block_node):
         '''
