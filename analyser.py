@@ -47,6 +47,27 @@ class Analyser:
             flow = Flow(flows)
 
         return flow
+    
+    def backup_flows(self):
+        res = {}
+        for var, flow in self.variable_flows.items():
+            res[var] = Flow([flow])
+        return res
+    # vf_1 - variable flows 1
+    # vf_2 - variable flows 2
+    # total_v - set of every key in both dictionaries
+    # final_vf - resulting variable flow
+    def merge_variable_flows(self, vf_1, vf_2):
+        final_vf = {}
+        total_v = set(vf_1.keys()) | set(vf_2.keys())
+        for v in total_v:
+            if v not in vf_1:
+                final_vf[v] = vf_2[v]
+            elif v not in vf_2:
+                final_vf[v] = vf_1[v]
+            else: 
+                final_vf[v] = Flow([vf_1[v], vf_2[v]])
+        return final_vf
 
     def run(self):
         self.dispatcher(self.program)
@@ -97,17 +118,19 @@ class Analyser:
         '''
         test = if_node['test']
         consequent = if_node['consequent']
-        alternate = if_node['alternate']
+        
         self.dispatcher(test)
+
+        previous_flow = self.backup_flows()
         self.dispatcher(consequent)
-        self.dispatcher(alternate)
-        if_full_name = '\n' + '  ' * (self.depth + 3) + f"if({test['full_name']}) {consequent['full_name']}"
-        if alternate != 'null':
-            if_full_name += '\n' + '  ' * (self.depth + 3) + f"else {alternate['full_name']}"
+        consequent_flow = self.backup_flows()
 
-        debug(f"IfStatement: {if_full_name}", self.depth)
+        
 
-        if_node['full_name'] = if_full_name
+        if 'alternate' in if_node:
+            self.variable_flows = self.backup_flows()
+            alternate = if_node['alternate']
+            self.dispatcher(alternate)
 
     def analyse_block_statement(self, block_node):
         '''
