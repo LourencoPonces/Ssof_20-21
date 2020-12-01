@@ -117,17 +117,11 @@ class Analyser:
         statements = block_node['body']
 
         statement_flows = []
-        block_full_name = '\n' + '  ' * (self.depth + 3) + '{\n'
         for statement in statements:
             self.dispatcher(statement)
             statement_flows.append(statement['flow'])
-            block_full_name += '  ' * (self.depth + 3) + '    ' + statement['full_name'] + '\n'
-        block_full_name += '  ' * (self.depth + 3) + '}'
-
-        debug(f"BlockStatement: {block_full_name}", self.depth)
 
         block_node['flow'] = Flow(statement_flows)
-        block_node['full_name'] = block_full_name
 
     def analyse_expression_statement(self, expression_node):
         '''
@@ -147,18 +141,15 @@ class Analyser:
         callee = call_node['callee']
         arguments = call_node['arguments']
         self.dispatcher(callee)
+        callee_flow = callee['flow']
         
         argument_flows = []
-        arguments_full_name = ''
         for argument in arguments:
             self.dispatcher(argument)
             argument_flows.append(argument['flow'])
         
-
-        callee_flow = callee['flow']
         args_flow = Flow(argument_flows)
-        # args_flow.remove_sanitizers()
-        # args_flow.remove_sinks()
+        args_flow.remove_sinks()
 
         call_flow = Flow([callee_flow, args_flow])
         call_node['flow'] = call_flow
@@ -178,6 +169,7 @@ class Analyser:
         
         self.dispatcher(left)
         self.dispatcher(right)
+
 
         # Assignment node gets flow from right
         right_flow = right['flow']
