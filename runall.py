@@ -22,6 +22,8 @@ FAIL = '\033[91m'
 BOLD = '\033[1m'
 UNDERLINE = '\033[4m'
 
+color = False
+
 def color_result(result):
     colors = {
         PASSED: OKGREEN,
@@ -29,7 +31,7 @@ def color_result(result):
         NO_OUT: WARNING,
         NO_EXP: WARNING
     }
-    if result in colors:
+    if color and result in colors:
         return BOLD + colors[result] + result + DEFAULT
     return result
 
