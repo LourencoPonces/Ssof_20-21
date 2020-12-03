@@ -76,30 +76,25 @@ def read_json(filepath):
 '''
 Test Directory Structure:
     / 
-    +----- expected
-    |  +----- expected_xx.json
-    |
-    +----- outputs
-    |  +----- program_xx.out.json
-    |
+    +----- programs
+    |  +----- test_name
+    |  |   +----- expected.json
+    |  |   +----- test_name.json
+    |  |   +----- test_name.js
+    |  |   +----- test_name.out.json
+    | ...
     +----- patterns
     |  +----- pattern_yy.json
-    |
-    +----- programs
-    |  +----- program_xx.js
-    |
-    +----- slices
-       +----- program_xx.json
-
+    | ...
+     
 '''
 # Returns output filepath that corresponds to given test path
-def get_out_filepath(slice_path):
-    return slice_path.parents[1] / "outputs" / f'{slice_path.stem}.out.json'
+def get_out_filepath(test_dir):
+    return test_dir / f'{test_dir.stem}.out.json'
 
-def get_expected_filepath(slice_path):
-    test_number = get_test_number(slice_path.stem)
-    return slice_path.parents[1] / "expected" / f'expected_{test_number}.json'
+def get_exp_filepath(test_dir):
+    return test_dir / "expected.json"
 
-def get_test_number(slice_stem):
-    return slice_stem.split("_")[1].split(".")[0]
+def get_ast_filepath(test_dir):
+    return test_dir / f'{test_dir.stem}.json'
 

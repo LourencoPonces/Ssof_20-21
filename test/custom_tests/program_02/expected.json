@@ -1,0 +1,12 @@
+[
+    {
+      "vulnerability": "DOM XSS",
+      "sources": [
+        "document.URL"
+      ],
+      "sanitizers": [],
+      "sinks": [
+        "document.write"
+      ]
+    }
+  ]

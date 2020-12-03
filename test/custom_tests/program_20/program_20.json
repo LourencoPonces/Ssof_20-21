@@ -1,0 +1,50 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "srcB1"
+          },
+          "right": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "sanA1"
+            },
+            "arguments": [
+              {
+                "type": "Identifier",
+                "name": "srcA1"
+              },
+              {
+                "type": "Identifier",
+                "name": "srcB1"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "snkB1"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "srcB1"
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }

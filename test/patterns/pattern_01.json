@@ -1,8 +1,18 @@
 [
     {"vulnerability": "Generic Vulnerability",
-    "sources": ["source", "a", "b", "c"],
+    "sources": ["source", "src1", "src2", "a", "b", "c"],
     "sanitizers": ["sanitizer"],
     "sinks": ["sink", "x", "y", "z"]},
+
+    {"vulnerability": "VulnA",
+    "sources": ["srcA1", "srcA2", "srcA3"],
+    "sanitizers": ["sanA1"],
+    "sinks": ["snkA1", "snkA2", "snkA3"]},
+        
+    {"vulnerability": "VulnB",
+    "sources": ["srcB1", "srcB2", "srcB2"],
+    "sanitizers": ["sanB1"],
+    "sinks": ["snkB1", "snkB2", "snkB3"]},
 
     {"vulnerability": "Command Injection",
     "sources": ["readline","req.headers","file_path"],
@@ -10,7 +20,7 @@
     "sinks": ["exec", "execSync", "spawn", "spawnSync", "execFile", "execFileSync"]},
   
     {"vulnerability":"DOM XSS",
-    "sources":["document.referrer", "document.url", "document.location"],
+    "sources":["document.referrer", "document.URL", "document.location"],
     "sanitizers":["encodeURI"],
     "sinks":["eval", "document.write", "document.innerHTML", "setAttribute"]}
 ]

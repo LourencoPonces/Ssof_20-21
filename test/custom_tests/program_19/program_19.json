@@ -1,0 +1,38 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "sanitize"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "source"
+            }
+          ]
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "sink"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "source"
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }

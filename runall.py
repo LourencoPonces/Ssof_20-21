@@ -1,9 +1,10 @@
 import sys
 from pathlib import Path
 
+import os
+
 from main import go
 from util import *
-from read_files import read_json
 
 
 def report_result(test_name, result):
@@ -41,9 +42,13 @@ if __name__ == '__main__':
     if not (pattern_path.exists() and pattern_path.is_file()):
         fatal(f'given pattern file does not exist')
 
-    slices = [f for f in slices_path.iterdir() if f.suffix == '.json' or len(f.suffixes) != 1]
-    slices.sort()
-    for slice_path in slices:
+    tests = [f for f in slices_path.iterdir()]
+    tests.sort()
+
+    passed = 0
+    for test_dir in tests:
+        ast_path = get_ast_filepath(test_dir)
+        out_path = get_out_filepath(test_dir)
 
         if out_path.exists():
             out_path.unlink()
@@ -56,12 +61,8 @@ if __name__ == '__main__':
 
         report_result(test_dir, result)
 
-        result = verify_output(slice_path)
         if result == PASSED:
-            print("PASSED")
-        elif result == FAILED:
-            print("FAILED")
-        elif result == NO_OUT:
-            print("No output file")
-        elif result == NO_EXP:
-            print("No exp file")
+            passed += 1
+
+
+    print(f"Passed {passed}/{len(tests)} ({100*passed/len(tests)}%)")
