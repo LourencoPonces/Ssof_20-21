@@ -1,0 +1,64 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "a"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "src1"
+          }
+        }
+      },
+      {
+        "type": "WhileStatement",
+        "test": {
+          "type": "Literal",
+          "value": false,
+          "raw": "false"
+        },
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "a"
+                },
+                "right": {
+                  "type": "Identifier",
+                  "name": "src2"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "sink"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "a"
+          }
+        }
+      }
+    ],
+    "sourceType": "script"
+  }
