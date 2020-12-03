@@ -13,7 +13,7 @@ def go(program_path, pattern_path):
     if not (pattern_path.exists() and pattern_path.is_file()):
         fatal(f'given pattern file does not exist')
 
-    output_path = get_out_filepath(program_path)
+    output_path = get_out_filepath(program_path.parents[0])
 
     program = read_json(program_path)
     patterns_json = read_json(pattern_path)

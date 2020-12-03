@@ -47,6 +47,29 @@ class Analyser:
             flow = Flow(flows)
 
         return flow
+    
+    def backup_flows(self):
+        res = {}
+        for var, flow in self.variable_flows.items():
+            res[var] = Flow([flow])
+        return res
+    
+    # vf_1 - variable flows 1
+    # vf_2 - variable flows 2
+    # total_v - set of every key in both dictionaries
+    # final_vf - resulting variable flow
+    def merge_variable_flows(self, vf_1, vf_2):
+        final_vf = {}
+        total_v = set(vf_1.keys()) | set(vf_2.keys())
+        for v in total_v:
+            if v not in vf_1:
+                final_vf[v] = vf_2[v]
+            elif v not in vf_2:
+                final_vf[v] = vf_1[v]
+            else: 
+                final_vf[v] = Flow([vf_1[v]])
+                final_vf[v].merge(vf_2[v])
+        return final_vf
 
     def run(self):
         self.dispatcher(self.program)
@@ -97,17 +120,22 @@ class Analyser:
         '''
         test = if_node['test']
         consequent = if_node['consequent']
-        alternate = if_node['alternate']
+        
         self.dispatcher(test)
+
+        # flow at if arrival
+        previous_flow = self.backup_flows()
         self.dispatcher(consequent)
-        self.dispatcher(alternate)
-        if_full_name = '\n' + '  ' * (self.depth + 3) + f"if({test['full_name']}) {consequent['full_name']}"
-        if alternate != 'null':
-            if_full_name += '\n' + '  ' * (self.depth + 3) + f"else {alternate['full_name']}"
 
-        debug(f"IfStatement: {if_full_name}", self.depth)
+        # flow resulting from the `then` statement
+        consequent_flow = self.backup_flows()
 
-        if_node['full_name'] = if_full_name
+        if if_node['alternate'] != None:
+            # restore arrival flow
+            self.variable_flows = previous_flow
+            self.dispatcher(if_node['alternate'])
+        
+        self.variable_flows = self.merge_variable_flows(previous_flow, consequent_flow)
 
     def analyse_block_statement(self, block_node):
         '''
@@ -117,17 +145,8 @@ class Analyser:
         statements = block_node['body']
 
         statement_flows = []
-        block_full_name = '\n' + '  ' * (self.depth + 3) + '{\n'
         for statement in statements:
             self.dispatcher(statement)
-            statement_flows.append(statement['flow'])
-            block_full_name += '  ' * (self.depth + 3) + '    ' + statement['full_name'] + '\n'
-        block_full_name += '  ' * (self.depth + 3) + '}'
-
-        debug(f"BlockStatement: {block_full_name}", self.depth)
-
-        block_node['flow'] = Flow(statement_flows)
-        block_node['full_name'] = block_full_name
 
     def analyse_expression_statement(self, expression_node):
         '''
@@ -147,18 +166,15 @@ class Analyser:
         callee = call_node['callee']
         arguments = call_node['arguments']
         self.dispatcher(callee)
+        callee_flow = callee['flow']
         
         argument_flows = []
-        arguments_full_name = ''
         for argument in arguments:
             self.dispatcher(argument)
             argument_flows.append(argument['flow'])
         
-
-        callee_flow = callee['flow']
         args_flow = Flow(argument_flows)
-        # args_flow.remove_sanitizers()
-        # args_flow.remove_sinks()
+        args_flow.remove_sinks()
 
         call_flow = Flow([callee_flow, args_flow])
         call_node['flow'] = call_flow
@@ -178,6 +194,7 @@ class Analyser:
         
         self.dispatcher(left)
         self.dispatcher(right)
+
 
         # Assignment node gets flow from right
         right_flow = right['flow']

@@ -12,7 +12,7 @@ class Sanitizer:
             }
     
     def get_tracked_patterns(self):
-        return self.tracked_patterns
+        return [self.tracked_patterns]
     
     def __repr__(self):
         return f'<Sanitizer {self.identifier}, {len(self.tracked_patterns)}>'

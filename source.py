@@ -14,7 +14,7 @@ class Source:
             }
     
     def get_tracked_patterns(self):
-        return self.tracked_patterns
+        return [self.tracked_patterns]
 
     def __repr__(self):
         return f'<Source {self.identifier}, {len(self.tracked_patterns)}>'

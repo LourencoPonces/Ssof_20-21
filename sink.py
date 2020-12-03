@@ -12,7 +12,7 @@ class Sink:
             }
     
     def get_tracked_patterns(self):
-        return self.tracked_patterns
+        return [self.tracked_patterns]
     
     def __repr__(self):
         return f'<Sink {self.identifier}, {len(self.tracked_patterns)}>'
