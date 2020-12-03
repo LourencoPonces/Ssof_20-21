@@ -38,6 +38,8 @@ class Analyser:
         if identifier in self.variable_flows:
             # get existing flow
             flow = self.variable_flows[identifier]
+            if identifier == 'sink':
+                print(f" IDENTIFIER SINK: {flow}")
         else:
             # new variable: check if source/sink/sanitizer
             flows = []
@@ -72,6 +74,7 @@ class Analyser:
                 changed = True
             else: 
                 final_vf[v] = Flow([vf_1[v]])
+                
                 if final_vf[v].merge(vf_2[v]):
                     changed = True
         
@@ -126,6 +129,10 @@ class Analyser:
             backup = self.backup_flows()
             self.dispatcher(body)
             changed = self.merge_variable_flows(backup, self.variable_flows)
+            if not changed:
+                print(">")
+                #print(f" > {backup}")
+                #print(f" > {self.variable_flows}")
 
 
     def analyse_if_statement(self, if_node):
@@ -219,13 +226,22 @@ class Analyser:
 
         # we don't want to account for left sources: they will be overwritten
         left_flow.remove_sources()
-
+        
+        if 'full_name' in right and 'full_name' in left:
+            if left['full_name'] == 'sink' and right['full_name'] == 'c':
+                print("HERE " * 10)
         resulting_flow = Flow([right_flow, left_flow])
         assignment_node['flow'] = Flow([right_flow])
-        
+
+        if 'full_name' in right and 'full_name' in left:
+            if left['full_name'] == 'sink' and right['full_name'] == 'c':
+                print(left_flow)
+                print(right_flow)
+                print(resulting_flow)
+                print("sink <= c")
         # Variable from left gets flow from right
         # NOTE: left node doesn't need to get the flow from right
-        self.variable_flows[left['full_name']] = right_flow
+        self.variable_flows[left['full_name']] = Flow([right_flow])
 
         # Check if left is sink
         self.vulnerabilities += resulting_flow.check_vulns()

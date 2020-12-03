@@ -130,15 +130,6 @@ b(source)
 sink1 = source
 sink2 = sink1
 
-a = src;
-b = "b";
-c = "c";
-i = 0
-while (i < ?) {
-    snk = c;
-    c = b;
-    b = a;
-}
 
 a = src;
 b = "b";

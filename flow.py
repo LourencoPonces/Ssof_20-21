@@ -17,12 +17,17 @@ class Flow:
         # }
 
         self.tracked_patterns = []
+        previous_flows = deepcopy(previous_flows)
+
+        print(previous_flows)
         
         all_flows = [flow.get_tracked_patterns() for flow in previous_flows if len(flow.get_tracked_patterns()) > 0]
+        # WARNING: These combinations point to the same lists!
         all_combs = product(*all_flows)
 
         for combination in all_combs:
             comb_pattern = {}
+            print(f"Combination: {list(combination)}")
             for pat in combination:
                 for pat_name, tracked in pat.items():
                     if pat_name not in comb_pattern:
@@ -84,7 +89,16 @@ class Flow:
     def merge(self, other_flow):
         # TODO: avoid duplicate patterns
         changed = False
-        incoming_patterns = other_flow.get_tracked_patterns()[:]        
+        incoming_patterns = deepcopy(other_flow.get_tracked_patterns())
+
+        if len(self.tracked_patterns) == 1 and self.tracked_patterns[0] == {}:
+            # empty patterns
+            if len(incoming_patterns) == 1 and incoming_patterns[0] == {}:
+                # if incoming is empty, did not change
+                return False
+            # new patterns = incoming!
+            self.tracked_patterns = incoming_patterns
+            return True
 
         for pattern in incoming_patterns:
             matches_any = False

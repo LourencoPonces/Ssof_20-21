@@ -28,7 +28,7 @@ def verify_output(test_dir):
     return PASSED if sort_dict(out) == sort_dict(exp) else FAILED
 
 if __name__ == '__main__':
-    init(debug = False, color = True)
+    init(debug = False, color = False)
 
     if len(sys.argv) != 1 + 2:
         fatal(f'Usage: {sys.argv[0]} <program_directory> <patterns.json>')
@@ -46,6 +46,7 @@ if __name__ == '__main__':
     tests.sort()
 
     passed = 0
+    failed = []
     for test_dir in tests:
         ast_path = get_ast_filepath(test_dir)
         out_path = get_out_filepath(test_dir)
@@ -63,6 +64,10 @@ if __name__ == '__main__':
 
         if result == PASSED:
             passed += 1
+        else:
+            failed.append(test_dir)
 
 
     print(f"Passed {passed}/{len(tests)} ({100*passed/len(tests)}%)")
+    for f in failed:
+        print(f)

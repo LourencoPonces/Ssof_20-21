@@ -22,7 +22,7 @@ debugging = True
 colors = True
 
 
-def init(debug = True, color = True):
+def init(debug = True, color = False):
     global debugging
     global colors
 
