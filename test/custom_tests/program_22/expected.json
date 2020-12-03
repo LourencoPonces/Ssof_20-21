@@ -2,7 +2,6 @@
     {
       "vulnerability": "VulnA",
       "sources": [
-        "srcA1",
         "srcA1"
       ],
       "sanitizers": [

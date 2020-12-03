@@ -1,91 +1,88 @@
 from vulnerability import Vulnerability
+from itertools import product
+from copy import deepcopy
 
 class Flow:
     def __init__(self, previous_flows):
-        # What originated this flow (other Flows or Sources)
-        # [Flow / Source, ...]
-        self.previous_flows = previous_flows
 
-        # Shortcut for every flow leaf
-        # [Source, ...]
-        self.sources = []
+        # List of tracked Sources, Sinks and Sanitizers per pattern
+        # {
+        #   pattern_name : {
+        #       pattern: Pattern,
+        #       sources : [source, ...],
+        #       sinks: [sink, ...],
+        #       sanitizers: [sanitizer, ...]
+        #   }
+        # }
 
-        # List of sanitizers per pattern
-        self.sanitizers = {}
-
-        for flow in previous_flows:
-            # Some of these flows might be a Source. Magic...
-            self.sources += flow.get_sources()
-            for pat_name, sanitizers in flow.get_sanitizers().items():
-                if pat_name not in self.sanitizers:
-                    self.sanitizers[pat_name] = []
-                
-                for sanitizer in sanitizers:
-                    if sanitizer not in self.sanitizers[pat_name]:
-                        self.sanitizers[pat_name].append(sanitizer)
-
-    def is_tainted(self):
-        return len(self.sources) > 0
-
-    def get_sources(self):
-        return self.sources
-
-    def get_sanitizers(self):
-        return self.sanitizers
-
-    def check_sanitizer(self, sanitizer_name, arguments):
-        for argument in arguments:
-            for source in argument['flow'].get_sources():
-                found_patterns = source.check_sanitizer(sanitizer_name)
-                for pattern in found_patterns:
-                    pattern_name = pattern.get_name()
-
-                    if pattern_name not in self.sanitizers:
-                        self.sanitizers[pattern_name] = []
-                    
-                    if sanitizer_name not in self.sanitizers[pattern_name]:
-                        self.sanitizers[pattern_name].append(sanitizer_name)
-
-    def check_sink(self, sink_name):
-        matching_patterns = {}
-        for source in self.sources:
-            found_patterns = source.check_sink(sink_name)
-
-            # merge multiple sources for the same pattern
-            for pattern in found_patterns:
-                pattern_name = pattern.get_name()
-                
-                if pattern_name in matching_patterns:
-                    pattern = matching_patterns[pattern_name]
-                else:
-                    pattern = {
-                        'name': pattern_name,
-                        'sources': []
-                    }
-                    matching_patterns[pattern_name] = pattern
-                
-                pattern['sources'].append(source.get_identifier())
+        self.tracked_patterns = []
         
+        all_flows = [flow.get_tracked_patterns() for flow in previous_flows if len(flow.get_tracked_patterns()) > 0]
+        all_combs = product(*all_flows)
+
+        for combination in all_combs:
+            comb_pattern = {}
+            for pat in combination:
+                for pat_name, tracked in pat.items():
+                    if pat_name not in comb_pattern:
+                        comb_pattern[pat_name] = deepcopy(tracked)
+                    else:
+                        # Pattern already exists. Adding unique sources/sinks/sanitizers
+                        known_sources = comb_pattern[pat_name]['sources']                    
+                        known_sinks = comb_pattern[pat_name]['sinks']
+                        known_sanitizers = comb_pattern[pat_name]['sanitizers']
+
+                        for source in tracked['sources']:
+                            if source not in known_sources:
+                                known_sources.append(source)
+                        
+                        for sink in tracked['sinks']:
+                            if sink not in known_sinks:
+                                known_sinks.append(sink)
+                        
+                        for sanitizer in tracked['sanitizers']:
+                            if sanitizer not in known_sanitizers:
+                                known_sanitizers.append(sanitizer)
+            self.tracked_patterns.append(comb_pattern)
+
+    def get_tracked_patterns(self):
+        return self.tracked_patterns
+
+    def remove_sanitizers(self):
+        for possible_flow in self.tracked_patterns:
+            for tracked in possible_flow.values():
+                tracked['sanitizers'] = []
+
+    def remove_sinks(self):
+        for possible_flow in self.tracked_patterns:
+            for tracked in possible_flow.values():
+                tracked['sinks'] = []
+    
+    def remove_sources(self):
+        for possible_flow in self.tracked_patterns:
+            for tracked in possible_flow.values():
+                tracked['sources'] = []
+
+    def check_vulns(self):
         vulns = []
-        for pattern in matching_patterns.values():
-            name = pattern['name']
-            sources = pattern['sources']
-            sanitizers = []
-            if name in self.sanitizers:
-                sanitizers = self.sanitizers[name]
-            
-            sinks = [sink_name]
-            vuln = Vulnerability(name, sources, sanitizers, sinks)
-            vulns.append(vuln)
+        for possible_flow in self.tracked_patterns:
+            for pat_name, tracked in possible_flow.items():
+                if len(tracked['sources']) > 0 and len(tracked['sinks']) > 0:
+                    for sink in tracked['sinks']:
+                        # [:] makes a copy of the array, so the reported vuln isn't changed
+                        # after being reported
+                        vuln_name = pat_name
+                        src = tracked['sources'][:]
+                        san = tracked['sanitizers'][:]
+                        snk = [sink][:]
+                        vulns.append(Vulnerability(vuln_name, src, san, snk))
+                    # clear already reported sinks
+                    tracked['sinks'] = []
         return vulns
 
+    def merge(self, other_flow):
+        # TODO: avoid duplicate patterns
+        self.tracked_patterns += other_flow.get_tracked_patterns()[:]
+
     def __repr__(self):
-        return f'<Flow from {self.sources.__repr__()}>'
-    
-    def __str__(self):
-        obj = {
-            'type': 'flow',
-            'previous_flows': [flow for flow in self.previous_flows],
-            'sources': [source for source in self.sources]
-        }
-        return obj.__str__()
+        return f"<Flow {self.tracked_patterns}>"

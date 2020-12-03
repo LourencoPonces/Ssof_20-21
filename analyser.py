@@ -1,6 +1,8 @@
 from flow import Flow
 from util import debug
 from source import Source
+from sink import Sink
+from sanitizer import Sanitizer
 
 class Analyser:
     def __init__(self, program, patterns):
@@ -16,18 +18,58 @@ class Analyser:
             if patt.detect_source(potential):
                 res_patts.append(patt)
         return res_patts
+    
+    def is_sink(self, potential):
+        res_patts = []
+        for patt in self.patterns:
+            if patt.detect_sink(potential):
+                res_patts.append(patt)
+        return res_patts
+    
+    def is_sanitizer(self, potential):
+        res_patts = []
+        for patt in self.patterns:
+            if patt.detect_sanitizer(potential):
+                res_patts.append(patt)
+        return res_patts
+
 
     def get_identifier_flow(self, identifier):
         if identifier in self.variable_flows:
+            # get existing flow
             flow = self.variable_flows[identifier]
         else:
-            vuln_patterns = self.is_source(identifier) 
-            if len(vuln_patterns) != 0:
-                flow = Flow([Source(identifier = identifier, patterns = vuln_patterns)])
-            else:
-                flow = Flow([])
+            # new variable: check if source/sink/sanitizer
+            flows = []
+            flows.append(Source(identifier, self.is_source(identifier)))
+            flows.append(Sink(identifier, self.is_sink(identifier)))
+            flows.append(Sanitizer(identifier, self.is_sanitizer(identifier)))
+            flow = Flow(flows)
 
         return flow
+    
+    def backup_flows(self):
+        res = {}
+        for var, flow in self.variable_flows.items():
+            res[var] = Flow([flow])
+        return res
+    
+    # vf_1 - variable flows 1
+    # vf_2 - variable flows 2
+    # total_v - set of every key in both dictionaries
+    # final_vf - resulting variable flow
+    def merge_variable_flows(self, vf_1, vf_2):
+        final_vf = {}
+        total_v = set(vf_1.keys()) | set(vf_2.keys())
+        for v in total_v:
+            if v not in vf_1:
+                final_vf[v] = vf_2[v]
+            elif v not in vf_2:
+                final_vf[v] = vf_1[v]
+            else: 
+                final_vf[v] = Flow([vf_1[v]])
+                final_vf[v].merge(vf_2[v])
+        return final_vf
 
     def run(self):
         self.dispatcher(self.program)
@@ -59,7 +101,6 @@ class Analyser:
 
     def analyse_program(self, program_node):
         for instruction in program_node['body']:
-            # print(instruction)
             self.dispatcher(instruction)
 
     def analyse_while_statement(self, while_node):
@@ -79,17 +120,22 @@ class Analyser:
         '''
         test = if_node['test']
         consequent = if_node['consequent']
-        alternate = if_node['alternate']
+        
         self.dispatcher(test)
+
+        # flow at if arrival
+        previous_flow = self.backup_flows()
         self.dispatcher(consequent)
-        self.dispatcher(alternate)
-        if_full_name = '\n' + '  ' * (self.depth + 3) + f"if({test['full_name']}) {consequent['full_name']}"
-        if alternate != 'null':
-            if_full_name += '\n' + '  ' * (self.depth + 3) + f"else {alternate['full_name']}"
 
-        debug(f"IfStatement: {if_full_name}", self.depth)
+        # flow resulting from the `then` statement
+        consequent_flow = self.backup_flows()
 
-        if_node['full_name'] = if_full_name
+        if if_node['alternate'] != None:
+            # restore arrival flow
+            self.variable_flows = previous_flow
+            self.dispatcher(if_node['alternate'])
+        
+        self.variable_flows = self.merge_variable_flows(previous_flow, consequent_flow)
 
     def analyse_block_statement(self, block_node):
         '''
@@ -99,17 +145,8 @@ class Analyser:
         statements = block_node['body']
 
         statement_flows = []
-        block_full_name = '\n' + '  ' * (self.depth + 3) + '{\n'
         for statement in statements:
             self.dispatcher(statement)
-            statement_flows.append(statement['flow'])
-            block_full_name += '  ' * (self.depth + 3) + '    ' + statement['full_name'] + '\n'
-        block_full_name += '  ' * (self.depth + 3) + '}'
-
-        debug(f"BlockStatement: {block_full_name}", self.depth)
-
-        block_node['flow'] = Flow(statement_flows)
-        block_node['full_name'] = block_full_name
 
     def analyse_expression_statement(self, expression_node):
         '''
@@ -118,9 +155,7 @@ class Analyser:
             directive?: string;
         '''
         self.dispatcher(expression_node['expression'])
-        debug(f"ExpressionStatement: {expression_node['expression']['full_name']}", self.depth)
         expression_node['flow'] = Flow([expression_node['expression']['flow']])
-        expression_node['full_name'] = expression_node['expression']['full_name']
 
     def analyse_call_expression(self, call_node):
         '''
@@ -131,23 +166,20 @@ class Analyser:
         callee = call_node['callee']
         arguments = call_node['arguments']
         self.dispatcher(callee)
+        callee_flow = callee['flow']
         
         argument_flows = []
-        arguments_full_name = ''
         for argument in arguments:
             self.dispatcher(argument)
             argument_flows.append(argument['flow'])
-            arguments_full_name += argument['full_name'] + ', '
+        
+        args_flow = Flow(argument_flows)
+        args_flow.remove_sinks()
 
-        debug(f"CallExpression: {callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})", self.depth)
+        call_flow = Flow([callee_flow, args_flow])
+        call_node['flow'] = call_flow
 
-        # Functions pass the flow from their arguments
-        flow = Flow([callee['flow']] + argument_flows)
-        call_node['flow'] = flow
-        call_node['full_name'] = f"{callee['full_name']}({arguments_full_name[0 : len(arguments_full_name) - 2]})"
-
-        flow.check_sanitizer(callee['full_name'], arguments)
-        self.vulnerabilities += flow.check_sink(callee['full_name'])
+        self.vulnerabilities += call_flow.check_vulns()
         
     def analyse_assignment_expression(self, assignment_node):
         '''
@@ -162,20 +194,24 @@ class Analyser:
         
         self.dispatcher(left)
         self.dispatcher(right)
-        
-        debug(f"AssignmentExpression: {left['full_name']} {operator} {right['full_name']}", self.depth)
+
 
         # Assignment node gets flow from right
-        flow = Flow([right['flow']])
-        assignment_node['flow'] = flow
-        assignment_node['full_name'] = f"{left['full_name']} {operator} {right['full_name']}"
+        right_flow = right['flow']
+        left_flow  =  left['flow']
+
+        # we don't want to account for left sources: they will be overwritten
+        left_flow.remove_sources()
+
+        resulting_flow = Flow([right_flow, left_flow])
+        assignment_node['flow'] = Flow([right_flow])
         
         # Variable from left gets flow from right
         # NOTE: left node doesn't need to get the flow from right
-        self.variable_flows[left['full_name']] = flow
-        
+        self.variable_flows[left['full_name']] = right_flow
+
         # Check if left is sink
-        self.vulnerabilities += flow.check_sink(left['full_name'])
+        self.vulnerabilities += resulting_flow.check_vulns()
         
     def analyse_binary_expression(self, binary_node):
         '''
@@ -213,7 +249,6 @@ class Analyser:
 
         member_node['full_name'] = full_name
         debug(f"Member Expression: {full_name}", self.depth)
-
         member_node['flow'] = self.get_identifier_flow(full_name)
 
     def analyse_identifier(self, identifier_node):
@@ -226,7 +261,6 @@ class Analyser:
 
         # used above in recursion to find the full name (e.g. MemberExpression)
         identifier_node['full_name'] = name
-
         identifier_node['flow'] = self.get_identifier_flow(name)
 
     def analyse_literal(self, literal_node):
