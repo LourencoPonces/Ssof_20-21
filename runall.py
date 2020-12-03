@@ -7,37 +7,8 @@ from main import go
 from util import *
 
 
-PASSED = "OK"
-FAILED = "NOK"
-NO_OUT = "NO OUT"
-NO_EXP = "NO EXP"
-
-DEFAULT = '\033[0m'
-HEADER = '\033[95m'
-OKBLUE = '\033[94m'
-OKCYAN = '\033[96m'
-OKGREEN = '\033[92m'
-WARNING = '\033[93m'
-FAIL = '\033[91m'
-BOLD = '\033[1m'
-UNDERLINE = '\033[4m'
-
-color = False
-
-def color_result(result):
-    colors = {
-        PASSED: OKGREEN,
-        FAILED: FAIL,
-        NO_OUT: WARNING,
-        NO_EXP: WARNING
-    }
-    if color and result in colors:
-        return BOLD + colors[result] + result + DEFAULT
-    return result
-
 def report_result(test_name, result):
     cols = os.get_terminal_size(1).columns
-    result = verify_output(test_name)
     test_name = test_dir.stem
     num_dash = cols - len(result) - len(test_name) - 7
     print(f'[ {test_name} {"-"*num_dash}> {color_result(result)} ]')
@@ -57,6 +28,8 @@ def verify_output(test_dir):
     return PASSED if sort_dict(out) == sort_dict(exp) else FAILED
 
 if __name__ == '__main__':
+    init(debug = False, color = True)
+
     if len(sys.argv) != 1 + 2:
         fatal(f'Usage: {sys.argv[0]} <program_directory> <patterns.json>')
 
@@ -80,9 +53,12 @@ if __name__ == '__main__':
         if out_path.exists():
             out_path.unlink()
 
-        go(ast_path, pattern_path)
+        try:
+            go(ast_path, pattern_path)
+            result = verify_output(test_dir)
+        except:
+            result = ERROR
 
-        result = verify_output(test_dir)
         report_result(test_dir, result)
 
         if result == PASSED:

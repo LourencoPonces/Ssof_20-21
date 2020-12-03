@@ -1,7 +1,34 @@
 import sys
 import json
 
-debugging = False
+PASSED = "OK"
+FAILED = "NOK"
+ERROR = "ERROR"
+NO_OUT = "NO OUT"
+NO_EXP = "NO EXP"
+
+DEFAULT = '\033[0m'
+HEADER = '\033[95m'
+OKBLUE = '\033[94m'
+OKCYAN = '\033[96m'
+OKGREEN = '\033[92m'
+WARNING = '\033[93m'
+FAIL = '\033[91m'
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
+
+
+debugging = True
+colors = True
+
+
+def init(debug = True, color = True):
+    global debugging
+    global colors
+
+    debugging = debug
+    colors = color
+
 
 def fatal(msg):
     print(f"[Error] {msg}")
@@ -11,6 +38,19 @@ def fatal(msg):
 def debug(msg, level = 0):
     if debugging:
         print(f'[DBG] {"  "*level}{msg}')
+
+
+def color_result(result):
+    result_colors = {
+        PASSED: OKGREEN,
+        FAILED: FAIL,
+        ERROR: FAIL,
+        NO_OUT: WARNING,
+        NO_EXP: WARNING
+    }
+    if colors and result in result_colors:
+        return BOLD + result_colors[result] + result + DEFAULT
+    return result
 
 
 # Sort json objects, to compare them correctly
