@@ -1,6 +1,7 @@
 from vulnerability import Vulnerability
 from itertools import product
 from copy import deepcopy
+from util import sort_dict
 
 class Flow:
     def __init__(self, previous_flows):
@@ -82,7 +83,24 @@ class Flow:
 
     def merge(self, other_flow):
         # TODO: avoid duplicate patterns
-        self.tracked_patterns += other_flow.get_tracked_patterns()[:]
+        changed = False
+        incoming_patterns = other_flow.get_tracked_patterns()[:]        
+
+        for pattern in incoming_patterns:
+            matches_any = False
+            sorted_incoming_pattern = sort_dict(pattern)
+            for our_pattern in self.tracked_patterns:
+                sorted_our_pattern = sort_dict(our_pattern)
+                # since they are sorted, the str will produce the same string
+                if str(sorted_incoming_pattern) == str(sorted_our_pattern):
+                    matches_any = True
+                    break
+
+            if not matches_any:
+                self.tracked_patterns.append(pattern)
+                changed = True
+
+        return changed
 
     def __repr__(self):
         return f"<Flow {self.tracked_patterns}>"

@@ -58,18 +58,25 @@ class Analyser:
     # vf_2 - variable flows 2
     # total_v - set of every key in both dictionaries
     # final_vf - resulting variable flow
+    # returns if the flow has changed
     def merge_variable_flows(self, vf_1, vf_2):
+        changed = False
         final_vf = {}
         total_v = set(vf_1.keys()) | set(vf_2.keys())
         for v in total_v:
             if v not in vf_1:
                 final_vf[v] = vf_2[v]
+                changed = True
             elif v not in vf_2:
                 final_vf[v] = vf_1[v]
+                changed = True
             else: 
                 final_vf[v] = Flow([vf_1[v]])
-                final_vf[v].merge(vf_2[v])
-        return final_vf
+                if final_vf[v].merge(vf_2[v]):
+                    changed = True
+        
+        self.variable_flows =  final_vf
+        return changed
 
     def run(self):
         self.dispatcher(self.program)
@@ -109,7 +116,17 @@ class Analyser:
             test: Expression;
             body: Statement;
         '''
-        return
+        test = while_node['test']
+        body = while_node['body']
+
+        # check body (and test) flows while body keeps changing variable flows
+        changed = True
+        while changed:
+            self.dispatcher(test)
+            backup = self.backup_flows()
+            self.dispatcher(body)
+            changed = self.merge_variable_flows(backup, self.variable_flows)
+
 
     def analyse_if_statement(self, if_node):
         '''
@@ -135,7 +152,7 @@ class Analyser:
             self.variable_flows = previous_flow
             self.dispatcher(if_node['alternate'])
         
-        self.variable_flows = self.merge_variable_flows(previous_flow, consequent_flow)
+        self.merge_variable_flows(previous_flow, consequent_flow)
 
     def analyse_block_statement(self, block_node):
         '''
