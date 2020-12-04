@@ -1,0 +1,65 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "a"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "src1"
+          }
+        }
+      },
+      {
+        "type": "IfStatement",
+        "test": {
+          "type": "Literal",
+          "value": true,
+          "raw": "true"
+        },
+        "consequent": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "a"
+                },
+                "right": {
+                  "type": "Identifier",
+                  "name": "src2"
+                }
+              }
+            }
+          ]
+        },
+        "alternate": null
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "sink"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "a"
+          }
+        }
+      }
+    ],
+    "sourceType": "script"
+  }
