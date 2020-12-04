@@ -106,19 +106,19 @@ class Flow:
         return vulns
 
     def merge(self, other_flow):
-        # TODO: avoid duplicate patterns
         changed = False
         incoming_patterns = deepcopy(other_flow.get_tracked_patterns())
 
+        if len(incoming_patterns) == 1 and incoming_patterns[0] == {}:
+            # if incoming is empty, did not change
+            return False
+
         if len(self.tracked_patterns) == 1 and self.tracked_patterns[0] == {}:
-            # empty patterns
-            if len(incoming_patterns) == 1 and incoming_patterns[0] == {}:
-                # if incoming is empty, did not change
-                return False
-            # new patterns = incoming!
+            # empty patterns: new patterns = incoming!
             self.tracked_patterns = incoming_patterns
             return True
 
+        # TODO: avoid duplicate patterns
         for pattern in incoming_patterns:
             matches_any = False
             sorted_incoming_pattern = sort_dict(pattern)
