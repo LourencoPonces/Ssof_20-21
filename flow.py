@@ -17,17 +17,36 @@ class Flow:
         # }
 
         self.tracked_patterns = []
-        previous_flows = deepcopy(previous_flows)
+        # previous_flows = deepcopy(previous_flows)
 
-        print(previous_flows)
-        
-        all_flows = [flow.get_tracked_patterns() for flow in previous_flows if len(flow.get_tracked_patterns()) > 0]
+        # remove redundant flows
+        all_flows = []
+        for flow in previous_flows:
+            tp = flow.get_tracked_patterns()
+            flow_patterns = []
+            for possible_pattern in tp: # for every {} in [ {} , ... ]
+                copy = {}
+                for pat_name, tracked in possible_pattern.items():
+                    src = tracked['sources']
+                    snk = tracked['sinks']
+                    snt = tracked['sanitizers']
+                    if len(src + snk + snt) > 0:
+                        copy[pat_name] = deepcopy(tracked)
+                if len(copy.keys()) > 0:
+                    flow_patterns.append(copy)
+            if len(flow_patterns) > 0:
+                all_flows.append(flow_patterns)
+
+        if len(all_flows) == 0:
+            self.tracked_patterns = [{}]
+            return
+
+        # all_flows = [flow.get_tracked_patterns() for flow in previous_flows if len(flow.get_tracked_patterns()) > 0]
         # WARNING: These combinations point to the same lists!
         all_combs = product(*all_flows)
 
         for combination in all_combs:
             comb_pattern = {}
-            print(f"Combination: {list(combination)}")
             for pat in combination:
                 for pat_name, tracked in pat.items():
                     if pat_name not in comb_pattern:
