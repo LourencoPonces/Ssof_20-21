@@ -17,6 +17,8 @@ class Flow:
         # }
 
         self.tracked_patterns = []
+
+        self.reported_vuls = []
         # previous_flows = deepcopy(previous_flows)
 
         # remove redundant flows
@@ -100,7 +102,18 @@ class Flow:
                         src = tracked['sources'][:]
                         san = tracked['sanitizers'][:]
                         snk = [sink][:]
-                        vulns.append(Vulnerability(vuln_name, src, san, snk))
+                        
+                        vuln = Vulnerability(vuln_name, src, san, snk)
+                        duplicated = False
+
+                        for rv in self.reported_vuls:
+                            duplicated = False
+                            if str(rv) == str(vuln):
+                                duplicated = True
+                                break
+                        if not duplicated:
+                            self.reported_vuls.append(vuln)
+                            vulns.append(vuln)
                     # clear already reported sinks
                     tracked['sinks'] = []
         return vulns

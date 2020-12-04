@@ -63,6 +63,7 @@ class Analyser:
         changed = False
         final_vf = {}
         total_v = set(vf_1.keys()) | set(vf_2.keys())
+
         for v in total_v:
             if v not in vf_1:
                 final_vf[v] = vf_2[v]
@@ -75,6 +76,7 @@ class Analyser:
                 
                 if final_vf[v].merge(vf_2[v]):
                     changed = True
+
         
         self.variable_flows =  final_vf
         return changed
@@ -122,11 +124,28 @@ class Analyser:
 
         # check body (and test) flows while body keeps changing variable flows
         changed = True
+        initial_len = tmp_len = len(self.vulnerabilities)
+        while_vulns = []
+
         while changed:
             self.dispatcher(test)
             backup = self.backup_flows()
             self.dispatcher(body)
             changed = self.merge_variable_flows(backup, self.variable_flows)
+           
+            new_vulns = self.vulnerabilities[tmp_len:]
+
+            for vuln in new_vulns:
+                new = True
+                for v in while_vulns:
+                    if str(v) == str(vuln):
+                        new = False
+                        break
+                if new:
+                    while_vulns.append(vuln)
+            tmp_len = len(self.vulnerabilities)
+
+        self.vulnerabilities = self.vulnerabilities[:initial_len] + while_vulns
 
     def analyse_if_statement(self, if_node):
         '''
@@ -143,6 +162,7 @@ class Analyser:
         # flow at if arrival
         previous_flow = self.backup_flows()
         self.dispatcher(consequent)
+        
 
         # flow resulting from the `then` statement
         consequent_flow = self.backup_flows()
@@ -151,8 +171,10 @@ class Analyser:
             # restore arrival flow
             self.variable_flows = previous_flow
             self.dispatcher(if_node['alternate'])
-        
-        self.merge_variable_flows(previous_flow, consequent_flow)
+            self.merge_variable_flows(self.variable_flows, consequent_flow)
+        else:
+            self.merge_variable_flows(previous_flow, consequent_flow)
+
 
     def analyse_block_statement(self, block_node):
         '''
@@ -212,7 +234,6 @@ class Analyser:
         self.dispatcher(left)
         self.dispatcher(right)
 
-
         # Assignment node gets flow from right
         right_flow = right['flow']
         left_flow  =  left['flow']
@@ -220,6 +241,7 @@ class Analyser:
         # we don't want to account for left sources: they will be overwritten
         left_flow.remove_sources()
         left_flow.remove_sanitizers()
+        right_flow.remove_sinks()
         
         resulting_flow = Flow([right_flow, left_flow])
         assignment_node['flow'] = Flow([right_flow])

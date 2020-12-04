@@ -1,0 +1,77 @@
+[
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src1"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src2"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src3"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src2",
+      "src1"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src3",
+      "src1"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src3",
+      "src2"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src3",
+      "src2",
+      "src1"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  }
+]

@@ -1,6 +1,6 @@
 [
     {"vulnerability": "Generic Vulnerability",
-    "sources": ["source", "src1", "src2", "a", "b", "c"],
+    "sources": ["source", "src1", "src2", "src3", "src4", "src5", "src6", "src7", "src8"],
     "sanitizers": ["sanitizer"],
     "sinks": ["sink", "x", "y", "z"]},
 
