@@ -9,4 +9,4 @@ while (condition1) {
         a = a + src1
     }
 }
-sink =
+sink = a;

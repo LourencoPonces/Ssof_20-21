@@ -1,8 +1,8 @@
 a=b('nis');
 while (true) {
     if(x==10){
-	a = s(a,1);
-	break;
+        a = s(a,1);
+        break;
     }
     x++;
 }
