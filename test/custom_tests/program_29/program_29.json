@@ -1,0 +1,84 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "a"
+          },
+          "right": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "source"
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "value": "ola",
+                "raw": "\"ola\""
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "c"
+          },
+          "right": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "snkA2"
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "value": "oi",
+                "raw": "\"oi\""
+              },
+              {
+                "type": "Identifier",
+                "name": "srcA1"
+              },
+              {
+                "type": "Identifier",
+                "name": "snkA1"
+              },
+              {
+                "type": "Identifier",
+                "name": "a"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "sink"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "c"
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }

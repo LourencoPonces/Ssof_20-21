@@ -1,0 +1,5 @@
+a = src1()
+b = src2()
+c = src3(src4, src5())
+b = sanitizer(a)
+sink(a, b, c)

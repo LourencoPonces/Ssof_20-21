@@ -1,0 +1,38 @@
+[
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "source"
+    ],
+    "sanitizers": [
+      "sanitizer"
+    ],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "VulnA",
+    "sources": [
+      "srcA2",
+      "srcA1"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "snkA1"
+    ]
+  },
+  {
+    "vulnerability": "VulnA",
+    "sources": [
+      "srcA2",
+      "srcA1"
+    ],
+    "sanitizers": [
+      "sanA1"
+    ],
+    "sinks": [
+      "snkA2"
+    ]
+  }
+]

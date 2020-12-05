@@ -1,0 +1,44 @@
+[
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src1"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "snk1"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src1",
+      "src2"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "snk1"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src1"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "snk2"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "src1",
+      "src2"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "snk2"
+    ]
+  }
+]
