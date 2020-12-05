@@ -1,0 +1,366 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "a"
+          },
+          "right": {
+            "type": "Identifier",
+            "name": "source"
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "i"
+          },
+          "right": {
+            "type": "Literal",
+            "value": 0,
+            "raw": "0"
+          }
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "AssignmentExpression",
+          "operator": "=",
+          "left": {
+            "type": "Identifier",
+            "name": "c"
+          },
+          "right": {
+            "type": "Literal",
+            "value": "",
+            "raw": "\"\""
+          }
+        }
+      },
+      {
+        "type": "WhileStatement",
+        "test": {
+          "type": "BinaryExpression",
+          "operator": "<",
+          "left": {
+            "type": "Identifier",
+            "name": "i"
+          },
+          "right": {
+            "type": "Literal",
+            "value": 30,
+            "raw": "30"
+          }
+        },
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "operator": "==",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": true,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "a"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "a",
+                  "raw": "'a'"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "+=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "c"
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": "a",
+                        "raw": "'a'"
+                      }
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "operator": "==",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": true,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "a"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "b",
+                  "raw": "'b'"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "+=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "c"
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": "b",
+                        "raw": "'b'"
+                      }
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "operator": "==",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": true,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "a"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "c",
+                  "raw": "'c'"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "+=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "c"
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": "c",
+                        "raw": "'c'"
+                      }
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "operator": "==",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": true,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "a"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "d",
+                  "raw": "'d'"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "+=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "c"
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": "d",
+                        "raw": "'d'"
+                      }
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "operator": "==",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": true,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "a"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "e",
+                  "raw": "'e'"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "+=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "c"
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": "e",
+                        "raw": "'e'"
+                      }
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            },
+            {
+              "type": "IfStatement",
+              "test": {
+                "type": "BinaryExpression",
+                "operator": "==",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": true,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "a"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "f",
+                  "raw": "'f'"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "operator": "+=",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "c"
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": "f",
+                        "raw": "'f'"
+                      }
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            }
+          ]
+        }
+      },
+      {
+        "type": "ExpressionStatement",
+        "expression": {
+          "type": "CallExpression",
+          "callee": {
+            "type": "Identifier",
+            "name": "sink"
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "c"
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }
