@@ -2,7 +2,7 @@
     {"vulnerability": "Generic Vulnerability",
     "sources": ["source", "src", "src1", "src2", "src3", "src4", "src5", "src6", "src7", "src8"],
     "sanitizers": ["sanitizer"],
-    "sinks": ["sink", "x", "y", "z"]},
+    "sinks": ["sink", "snk", "snk1", "snk2", "snk3", "x", "y", "z"]},
 
     {"vulnerability": "VulnA",
     "sources": ["srcA1", "srcA2", "srcA3"],
