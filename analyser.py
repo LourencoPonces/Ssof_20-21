@@ -101,6 +101,7 @@ class Analyser:
     def dispatcher(self, node):
         table = {
             'Program':                  self.analyse_program,
+            'ForStatement':             self.analyse_for_statement,
             'WhileStatement':           self.analyse_while_statement,
             'DoWhileStatement':         self.analyse_do_while_statement,
             'IfStatement':              self.analyse_if_statement,
@@ -197,6 +198,75 @@ class Analyser:
         '''
         self.actually_analyse_while(do_while_node, do_while = True)
 
+    def analyse_for_statement(self, for_node):
+        '''
+            type: 'ForStatement';
+            init: Expression | VariableDeclaration | null;
+            test: Expression | null;
+            body: Statement;
+            update: Expression | null;
+        '''
+
+        init = for_node['init']
+        test = for_node['test']
+        update = for_node['update']
+        body = for_node['body']
+
+        self.dispatcher(init)
+
+        changed = True
+        initial_len = tmp_len = len(self.vulnerabilities)
+        for_vulns = []
+
+        backup = self.backup_flows()
+        try:
+            while changed:
+                try:
+                    self.dispatcher(body)
+                except Continue:
+                    # block will stop execution. Reevaluating test
+                    pass
+
+                self.dispatcher(update)
+
+                changed = self.merge_variable_flows(backup, self.variable_flows)
+            
+                # avoid reporting duplicate vulnerabilities
+                new_vulns = self.vulnerabilities[tmp_len:]  # get vulns from block stmt
+                for vuln in new_vulns:
+                    new = True
+                    for v in for_vulns:                   # check if new vuln
+                        if str(v) == str(vuln):
+                            new = False
+                            break
+                    if new:
+                        for_vulns.append(vuln)
+                tmp_len = len(self.vulnerabilities)
+                
+                # test will be executed again
+                self.dispatcher(test)
+                backup = self.backup_flows()
+
+        except Break:
+            # loop will exit for sure
+            self.merge_variable_flows(backup, self.variable_flows)
+
+        self.vulnerabilities = self.vulnerabilities[:initial_len] + for_vulns
+
+    def analyse_break(self, break_node):
+        '''
+        type: 'BreakStatement';
+        label: Identifier | null;
+        '''
+        raise Break()
+    
+    def analyse_continue(self, continue_node):
+        '''
+        type: 'ContinueStatement';
+        label: Identifier | null;
+        '''
+        raise Continue()
+
     def analyse_if_statement(self, if_node):
         '''
             type: 'IfStatement';
@@ -247,20 +317,6 @@ class Analyser:
         # if { continue } else { break } will at least continue
         if recvd_continue == 2 or (recvd_breaks == 1 and recvd_continue == 1):
             raise Continue()
-
-    def analyse_break(self, break_node):
-        '''
-        type: 'BreakStatement';
-        label: Identifier | null;
-        '''
-        raise Break()
-    
-    def analyse_continue(self, continue_node):
-        '''
-        type: 'ContinueStatement';
-        label: Identifier | null;
-        '''
-        raise Continue()
 
     def analyse_block_statement(self, block_node):
         '''

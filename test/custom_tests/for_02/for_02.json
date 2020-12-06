@@ -1,0 +1,138 @@
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "name": "a"
+        },
+        "right": {
+          "type": "Identifier",
+          "name": "src1"
+        }
+      }
+    },
+    {
+      "type": "ForStatement",
+      "init": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "name": "i"
+        },
+        "right": {
+          "type": "Identifier",
+          "name": "src2"
+        }
+      },
+      "test": {
+        "type": "Identifier",
+        "name": "condition"
+      },
+      "update": {
+        "type": "UpdateExpression",
+        "operator": "++",
+        "argument": {
+          "type": "Identifier",
+          "name": "i"
+        },
+        "prefix": false
+      },
+      "body": {
+        "type": "BlockStatement",
+        "body": [
+          {
+            "type": "IfStatement",
+            "test": {
+              "type": "Identifier",
+              "name": "test"
+            },
+            "consequent": {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "AssignmentExpression",
+                    "operator": "=",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "a"
+                    },
+                    "right": {
+                      "type": "BinaryExpression",
+                      "operator": "+",
+                      "left": {
+                        "type": "Identifier",
+                        "name": "a"
+                      },
+                      "right": {
+                        "type": "Identifier",
+                        "name": "i"
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "BreakStatement",
+                  "label": null
+                }
+              ]
+            },
+            "alternate": {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "AssignmentExpression",
+                    "operator": "=",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "a"
+                    },
+                    "right": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "Identifier",
+                        "name": "sanitizer"
+                      },
+                      "arguments": [
+                        {
+                          "type": "Identifier",
+                          "name": "a"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "CallExpression",
+        "callee": {
+          "type": "Identifier",
+          "name": "sink"
+        },
+        "arguments": [
+          {
+            "type": "Identifier",
+            "name": "a"
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}

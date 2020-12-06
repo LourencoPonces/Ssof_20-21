@@ -1,0 +1,182 @@
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "name": "a"
+        },
+        "right": {
+          "type": "Identifier",
+          "name": "src1"
+        }
+      }
+    },
+    {
+      "type": "ForStatement",
+      "init": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "name": "i"
+        },
+        "right": {
+          "type": "Identifier",
+          "name": "src2"
+        }
+      },
+      "test": {
+        "type": "Identifier",
+        "name": "condition"
+      },
+      "update": {
+        "type": "UpdateExpression",
+        "operator": "++",
+        "argument": {
+          "type": "Identifier",
+          "name": "i"
+        },
+        "prefix": false
+      },
+      "body": {
+        "type": "BlockStatement",
+        "body": [
+          {
+            "type": "ForStatement",
+            "init": {
+              "type": "AssignmentExpression",
+              "operator": "=",
+              "left": {
+                "type": "Identifier",
+                "name": "j"
+              },
+              "right": {
+                "type": "Literal",
+                "value": 3,
+                "raw": "3"
+              }
+            },
+            "test": {
+              "type": "Identifier",
+              "name": "condition2"
+            },
+            "update": {
+              "type": "AssignmentExpression",
+              "operator": "=",
+              "left": {
+                "type": "Identifier",
+                "name": "j"
+              },
+              "right": {
+                "type": "BinaryExpression",
+                "operator": "**",
+                "left": {
+                  "type": "Identifier",
+                  "name": "j"
+                },
+                "right": {
+                  "type": "Identifier",
+                  "name": "src3"
+                }
+              }
+            },
+            "body": {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "IfStatement",
+                  "test": {
+                    "type": "Identifier",
+                    "name": "condition4"
+                  },
+                  "consequent": {
+                    "type": "BlockStatement",
+                    "body": [
+                      {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                          "type": "AssignmentExpression",
+                          "operator": "=",
+                          "left": {
+                            "type": "Identifier",
+                            "name": "a"
+                          },
+                          "right": {
+                            "type": "BinaryExpression",
+                            "operator": "+",
+                            "left": {
+                              "type": "Identifier",
+                              "name": "a"
+                            },
+                            "right": {
+                              "type": "Identifier",
+                              "name": "j"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "alternate": {
+                    "type": "BlockStatement",
+                    "body": [
+                      {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                          "type": "AssignmentExpression",
+                          "operator": "=",
+                          "left": {
+                            "type": "Identifier",
+                            "name": "a"
+                          },
+                          "right": {
+                            "type": "BinaryExpression",
+                            "operator": "+",
+                            "left": {
+                              "type": "Identifier",
+                              "name": "a"
+                            },
+                            "right": {
+                              "type": "Identifier",
+                              "name": "i"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "BreakStatement",
+                        "label": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "ExpressionStatement",
+            "expression": {
+              "type": "CallExpression",
+              "callee": {
+                "type": "Identifier",
+                "name": "sink"
+              },
+              "arguments": [
+                {
+                  "type": "Identifier",
+                  "name": "a"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}
