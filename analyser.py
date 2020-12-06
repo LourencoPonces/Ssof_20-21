@@ -102,6 +102,7 @@ class Analyser:
         table = {
             'Program':                  self.analyse_program,
             'WhileStatement':           self.analyse_while_statement,
+            'DoWhileStatement':         self.analyse_do_while_statement,
             'IfStatement':              self.analyse_if_statement,
             'BlockStatement':           self.analyse_block_statement,
             'ExpressionStatement':      self.analyse_expression_statement,
@@ -129,21 +130,23 @@ class Analyser:
         for instruction in program_node['body']:
             self.dispatcher(instruction)
 
-    def analyse_while_statement(self, while_node):
-        '''
-            type: 'WhileStatement';
-            test: Expression;
-            body: Statement;
-        '''
+    def actually_analyse_while(self, while_node, do_while = False):
         test = while_node['test']
         body = while_node['body']
 
-        # check body (and test) flows while body keeps changing variable flows
         changed = True
         initial_len = tmp_len = len(self.vulnerabilities)
         while_vulns = []
-
         
+        if do_while:
+            # body will always be executed at least once
+            try:
+                self.dispatcher(body)
+            except Break:
+                return
+            except Continue:
+                pass
+
         self.dispatcher(test)
         backup = self.backup_flows()
         try:
@@ -177,6 +180,22 @@ class Analyser:
             self.merge_variable_flows(backup, self.variable_flows)
 
         self.vulnerabilities = self.vulnerabilities[:initial_len] + while_vulns
+
+    def analyse_while_statement(self, while_node):
+        '''
+            type: 'WhileStatement';
+            test: Expression;
+            body: Statement;
+        '''
+        self.actually_analyse_while(while_node)
+
+    def analyse_do_while_statement(self, do_while_node):
+        '''
+            type: 'DoWhileStatement';
+            body: Statement;
+            test: Expression;
+        '''
+        self.actually_analyse_while(do_while_node, do_while = True)
 
     def analyse_if_statement(self, if_node):
         '''
@@ -229,14 +248,12 @@ class Analyser:
         if recvd_continue == 2 or (recvd_breaks == 1 and recvd_continue == 1):
             raise Continue()
 
-
     def analyse_break(self, break_node):
         '''
         type: 'BreakStatement';
         label: Identifier | null;
         '''
         raise Break()
-
     
     def analyse_continue(self, continue_node):
         '''
