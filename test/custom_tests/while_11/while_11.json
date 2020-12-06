@@ -1,0 +1,39 @@
+{
+    "type": "Program",
+    "body": [
+      {
+        "type": "WhileStatement",
+        "test": {
+          "type": "Literal",
+          "value": true,
+          "raw": "true"
+        },
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "BreakStatement",
+              "label": null
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "CallExpression",
+                "callee": {
+                  "type": "Identifier",
+                  "name": "sink"
+                },
+                "arguments": [
+                  {
+                    "type": "Identifier",
+                    "name": "source"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  }

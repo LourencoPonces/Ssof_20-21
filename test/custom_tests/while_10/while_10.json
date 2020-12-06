@@ -124,7 +124,7 @@
           "arguments": [
             {
               "type": "Identifier",
-              "name": "c"
+              "name": "a"
             }
           ]
         }

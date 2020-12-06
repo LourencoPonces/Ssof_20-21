@@ -4,6 +4,19 @@ from source import Source
 from sink import Sink
 from sanitizer import Sanitizer
 
+'''
+Represents a break in the code
+'''
+class Break(Exception):
+    pass
+
+'''
+Represents a continue in the code
+'''
+class Continue(Exception):
+    pass
+
+
 class Analyser:
     def __init__(self, program, patterns):
         self.program = program              # the program to analyse        JSON
@@ -97,7 +110,10 @@ class Analyser:
             'BinaryExpression':         self.analyse_binary_expression,
             'MemberExpression':         self.analyse_member_expression,
             'Identifier':               self.analyse_identifier,
-            'Literal':                  self.analyse_literal
+            'Literal':                  self.analyse_literal,
+            'BreakStatement':           self.analyse_break,
+            'ContinueStatement':        self.analyse_continue,
+            'UpdateExpression':         self.analyze_updateExpression
         }
 
         node_type = node['type']
@@ -127,23 +143,40 @@ class Analyser:
         initial_len = tmp_len = len(self.vulnerabilities)
         while_vulns = []
 
-        while changed:
-            self.dispatcher(test)
-            backup = self.backup_flows()
-            self.dispatcher(body)
-            changed = self.merge_variable_flows(backup, self.variable_flows)
-           
-            new_vulns = self.vulnerabilities[tmp_len:]
+        
+        self.dispatcher(test)
+        backup = self.backup_flows()
+        try:
+            while changed:
+                try:
+                    self.dispatcher(body)
+                except Continue:
+                    # block will stop execution. Reevaluating test
+                    debug("GOT CONTINUE!", self.depth)
+                    pass
 
-            for vuln in new_vulns:
-                new = True
-                for v in while_vulns:
-                    if str(v) == str(vuln):
-                        new = False
-                        break
-                if new:
-                    while_vulns.append(vuln)
-            tmp_len = len(self.vulnerabilities)
+                changed = self.merge_variable_flows(backup, self.variable_flows)
+            
+                # avoid reporting duplicate vulnerabilities
+                new_vulns = self.vulnerabilities[tmp_len:]  # get vulns from block stmt
+                for vuln in new_vulns:
+                    new = True
+                    for v in while_vulns:                   # check if new vuln
+                        if str(v) == str(vuln):
+                            new = False
+                            break
+                    if new:
+                        while_vulns.append(vuln)
+                tmp_len = len(self.vulnerabilities)
+                
+                # test will be executed again
+                self.dispatcher(test)
+                backup = self.backup_flows()
+
+        except Break:
+            # loop will exit for sure
+            debug("GOT BREAK!", self.depth)
+            self.merge_variable_flows(backup, self.variable_flows)
 
         self.vulnerabilities = self.vulnerabilities[:initial_len] + while_vulns
 
@@ -157,24 +190,62 @@ class Analyser:
         test = if_node['test']
         consequent = if_node['consequent']
         
+        recvd_breaks = 0
+        recvd_continue = 0  
+
         self.dispatcher(test)
 
         # flow at if arrival
-        previous_flow = self.backup_flows()
-        self.dispatcher(consequent)
+        try:
+            previous_flow = self.backup_flows()
+            self.dispatcher(consequent)
+        except Break:
+            recvd_breaks += 1
+        except Continue:
+            recvd_continue += 1
         
-
         # flow resulting from the `then` statement
         consequent_flow = self.backup_flows()
 
         if if_node['alternate'] != None:
             # restore arrival flow
             self.variable_flows = previous_flow
-            self.dispatcher(if_node['alternate'])
+            
+            try:
+                self.dispatcher(if_node['alternate'])
+            except Break:
+                recvd_breaks += 1
+            except Continue:
+                recvd_continue += 1
+
             self.merge_variable_flows(self.variable_flows, consequent_flow)
         else:
             self.merge_variable_flows(previous_flow, consequent_flow)
+        
+        # if { break } else { break } will always break!
+        if recvd_breaks == 2:
+            raise Break()
+        
+        # if { continue } else { continue } will always continue!
+        # if { continue } else { break } will at least continue
+        if recvd_continue == 2 or (recvd_breaks == 1 and recvd_continue == 1):
+            raise Continue()
 
+
+    def analyse_break(self, break_node):
+        '''
+        type: 'BreakStatement';
+        label: Identifier | null;
+        '''
+        raise Break()
+
+    
+    def analyse_continue(self, continue_node):
+        '''
+        type: 'ContinueStatement';
+        label: Identifier | null;
+        '''
+        raise Continue()
 
     def analyse_block_statement(self, block_node):
         '''
@@ -195,6 +266,17 @@ class Analyser:
         '''
         self.dispatcher(expression_node['expression'])
         expression_node['flow'] = Flow([expression_node['expression']['flow']])
+
+    def analyze_updateExpression(self, update_expression_node):
+        '''
+        type: 'UpdateExpression';
+        operator: '++' | '--';
+        argument: Expression;
+        prefix: boolean;
+        '''
+        self.dispatcher(update_expression_node['argument'])
+        update_expression_node['flow'] = update_expression_node['argument']['flow']
+        return
 
     def analyse_call_expression(self, call_node):
         '''
@@ -269,7 +351,6 @@ class Analyser:
         self.dispatcher(right)
 
         binary_node['flow'] = Flow([left['flow'], right['flow']])
-        binary_node['full_name'] = f"{left['full_name']} {operator} {right['full_name']}"
 
     def analyse_member_expression(self, member_node):
         '''

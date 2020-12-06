@@ -1,0 +1,24 @@
+[
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "source"
+    ],
+    "sanitizers": [],
+    "sinks": [
+      "sink"
+    ]
+  },
+  {
+    "vulnerability": "Generic Vulnerability",
+    "sources": [
+      "source"
+    ],
+    "sanitizers": [
+      "sanitizer"
+    ],
+    "sinks": [
+      "sink"
+    ]
+  }
+]

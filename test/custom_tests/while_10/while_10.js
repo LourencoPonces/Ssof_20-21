@@ -6,4 +6,4 @@ while (true) {
     }
     x++;
 }
-q=sink(c);
+q=sink(a);
