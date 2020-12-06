@@ -152,7 +152,6 @@ class Analyser:
                     self.dispatcher(body)
                 except Continue:
                     # block will stop execution. Reevaluating test
-                    debug("GOT CONTINUE!", self.depth)
                     pass
 
                 changed = self.merge_variable_flows(backup, self.variable_flows)
@@ -175,7 +174,6 @@ class Analyser:
 
         except Break:
             # loop will exit for sure
-            debug("GOT BREAK!", self.depth)
             self.merge_variable_flows(backup, self.variable_flows)
 
         self.vulnerabilities = self.vulnerabilities[:initial_len] + while_vulns

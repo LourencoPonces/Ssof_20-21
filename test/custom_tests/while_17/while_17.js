@@ -1,7 +1,7 @@
-a = source1;
+a = src1;
 while(true) {
     while(condition) {
-        if(random() > 0.5) {
+        if(condition2) {
             continue;
         } else {
             break;
